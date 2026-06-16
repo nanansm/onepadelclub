@@ -1,6 +1,8 @@
 import Link from "next/link";
 
-export const dynamic = "force-static";
+// Di bawah layout (admin) yang butuh sesi -> wajib dynamic (jangan force-static,
+// kalau tidak requireAdmin jalan saat build tanpa user & redirect ke-bake).
+export const dynamic = "force-dynamic";
 
 const sections = [
   { label: "Input Skor", href: "/admin/liga/skor", desc: "Isi skor match, klasemen auto-update" },
