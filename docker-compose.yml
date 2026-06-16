@@ -1,0 +1,18 @@
+# Local dev Postgres saja. Isolated dari project lain (port host 5435, volume sendiri).
+# Prod TIDAK pakai file ini — Easypanel punya service onepadel-db sendiri.
+services:
+  db:
+    image: postgres:16
+    container_name: onepadel-db-local
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: onepadel
+      POSTGRES_PASSWORD: onepadel
+      POSTGRES_DB: onepadel
+    ports:
+      - "5435:5432"
+    volumes:
+      - onepadel_pgdata:/var/lib/postgresql/data
+
+volumes:
+  onepadel_pgdata:

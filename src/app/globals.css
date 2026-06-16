@@ -1,0 +1,705 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* ===== Tailwind theme — dipakai halaman booking/admin/login ===== */
+@theme {
+  --color-brand: #1a4d33;
+  --color-brand-fg: #f4f7ef;
+  --color-accent: #d97721;
+  --color-cream: #dfe8d0;
+
+  --color-background: #ffffff;
+  --color-foreground: #14241b;
+  --color-muted: #5b6b60;
+  --color-card: #ffffff;
+  --color-border: #e4e9e2;
+  --color-ring: #1a4d33;
+
+  --radius: 0.75rem;
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+a {
+  touch-action: manipulation;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ========================================================================
+   Landing page — clean / light editorial (scoped under .opc)
+   Struktur mengikuti padel-mythos, background dibuat bersih.
+   ======================================================================== */
+.opc {
+  --bg: #ffffff;
+  --surface: #faf9f5;
+  --surface-2: #f3f6ee;
+  --line: #e7ebe3;
+  --text: #16241d;
+  --muted: #5f6f64;
+  --accent: #d97721;
+  --brand: #1a4d33;
+  --on-accent: #ffffff;
+  --font-display: var(--font-instrument), Georgia, serif;
+
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-manrope), sans-serif;
+  overflow-x: hidden;
+}
+
+.opc-container {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ---------- type ---------- */
+.opc-h1 {
+  font-size: clamp(38px, 7vw, 68px);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  text-wrap: balance;
+}
+.opc-h1 em,
+.opc-h2 em,
+.opc-h3 em {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+}
+.opc-h2 {
+  font-size: clamp(28px, 5vw, 44px);
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.opc-h2-big {
+  font-size: clamp(34px, 6vw, 56px);
+}
+.opc-body {
+  font-size: clamp(15px, 4vw, 17px);
+  line-height: 1.65;
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+.opc-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.opc-tag-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* coming-soon status badge */
+.opc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 15px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--accent) 9%, transparent);
+  border: 1px solid color-mix(in oklab, var(--accent) 28%, var(--line));
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--accent);
+}
+.opc-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent);
+}
+
+/* signature tagline (serif italic, gaya IG) */
+.opc-tagline {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(19px, 4.5vw, 27px);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  color: var(--brand);
+}
+
+/* ---------- buttons (min 44px tap target) ---------- */
+.opc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 14px 26px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  cursor: pointer;
+  border: none;
+}
+.opc-btn-sm {
+  min-height: 40px;
+  padding: 9px 18px;
+  font-size: 14px;
+}
+.opc-btn-block {
+  width: 100%;
+}
+.opc-btn-primary {
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 8px 24px color-mix(in oklab, var(--accent) 26%, transparent);
+}
+.opc-btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px color-mix(in oklab, var(--accent) 36%, transparent);
+}
+.opc-btn-ghost {
+  border: 1px solid var(--line);
+  color: var(--text);
+  background: var(--bg);
+}
+.opc-btn-ghost:hover {
+  background: var(--surface);
+}
+
+/* ---------- nav ---------- */
+.opc-nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  backdrop-filter: blur(12px);
+  background: color-mix(in oklab, var(--bg) 85%, transparent);
+  border-bottom: 1px solid var(--line);
+}
+.opc-nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  height: 64px;
+}
+.opc-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+.opc-logo img {
+  height: 34px;
+  width: 34px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.opc-nav-links {
+  display: flex;
+  gap: 26px;
+  flex: 1;
+}
+.opc-nav-links a {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+.opc-nav-links a:hover {
+  color: var(--brand);
+}
+.opc-nav-actions {
+  margin-left: auto;
+}
+
+/* ---------- hero (asimetris 2-kolom: copy + court poster) ---------- */
+.opc-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(640px 420px at 18% -10%, color-mix(in oklab, var(--accent) 9%, transparent), transparent),
+    radial-gradient(520px 360px at 92% 4%, color-mix(in oklab, var(--brand) 8%, transparent), transparent);
+}
+.opc-hero-inner {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 52px;
+  align-items: center;
+  /* padding-block saja — biar horizontal padding dari .opc-container tetap dipakai */
+  padding-block: clamp(48px, 7vw, 80px) clamp(48px, 6vw, 72px);
+}
+.opc-hero-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 20px;
+}
+.opc-hero-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.opc-hero-stats {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-top: 8px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line);
+  width: 100%;
+}
+.opc-stat {
+  text-align: left;
+  min-width: 0;
+}
+
+/* court poster (mirror grafik Coming Soon IG) */
+.opc-poster {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 26px;
+  overflow: hidden;
+  background: linear-gradient(
+    122deg,
+    #1c5238 0%,
+    #1c5238 44%,
+    #efe9da 44%,
+    #efe9da 46.5%,
+    #bb5430 46.5%,
+    #a4471f 100%
+  );
+  box-shadow: 0 30px 70px rgba(20, 36, 27, 0.22);
+}
+.opc-poster-badge {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #fff;
+}
+.opc-poster-ball {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #d7e96a;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.opc-poster-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  padding: 24px;
+}
+.opc-poster-center img {
+  width: clamp(96px, 22%, 132px);
+  height: auto;
+}
+.opc-poster-tagline {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(15px, 2.2vw, 19px);
+  color: #f4f1e6;
+  letter-spacing: -0.01em;
+  max-width: 240px;
+}
+.opc-stat-num {
+  font-size: clamp(20px, 5vw, 24px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--brand);
+}
+.opc-stat-label {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.opc-stat-divider {
+  width: 1px;
+  height: 32px;
+  background: var(--line);
+}
+
+/* ---------- sections ---------- */
+.opc-section {
+  padding: clamp(56px, 9vw, 100px) 0;
+  position: relative;
+}
+.opc-section-alt {
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.opc-center-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  margin-bottom: clamp(36px, 6vw, 56px);
+}
+
+/* ---------- cards (cara main) ---------- */
+.opc-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+.opc-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 26px 22px;
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+}
+.opc-card:hover {
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--line));
+  transform: translateY(-3px);
+  box-shadow: 0 14px 34px rgba(20, 36, 27, 0.08);
+}
+.opc-card-num {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 32px;
+  color: var(--accent);
+  line-height: 1;
+}
+.opc-card-title {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.opc-card-body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+  flex: 1;
+}
+.opc-card-link {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-top: 2px;
+}
+
+/* ---------- court price cards ---------- */
+.opc-courts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+.opc-court {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px 16px;
+  text-align: center;
+}
+.opc-court-name {
+  font-size: 16px;
+  font-weight: 800;
+}
+.opc-court-type {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+.opc-court-price {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--brand);
+  margin-top: 14px;
+}
+.opc-court-unit {
+  font-size: 12px;
+  color: var(--muted);
+}
+.opc-courts-cta {
+  text-align: center;
+  margin-top: clamp(28px, 5vw, 40px);
+}
+
+/* ---------- cara booking (steps) ---------- */
+.opc-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+.opc-step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 28px 24px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+}
+.opc-step-num {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in oklab, var(--accent) 12%, transparent);
+  border: 1px solid color-mix(in oklab, var(--accent) 36%, var(--line));
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 16px;
+}
+.opc-step-title {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.opc-step-body {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.opc-step-line {
+  position: absolute;
+  top: 48px;
+  right: -19px;
+  width: 20px;
+  height: 1px;
+  background: var(--line);
+  z-index: 1;
+}
+
+/* ---------- liga feature block (brand green, kontras di light) ---------- */
+.opc-feature {
+  border-radius: 26px;
+  background: var(--brand);
+  color: var(--brand-fg, #f4f7ef);
+  padding: clamp(40px, 7vw, 60px) clamp(24px, 5vw, 48px);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.opc-feature .opc-tag {
+  color: var(--cream, #dfe8d0);
+}
+.opc-feature .opc-tag-dot {
+  background: var(--cream, #dfe8d0);
+}
+.opc-feature .opc-h2 {
+  color: #f4f7ef;
+}
+.opc-feature .opc-h2 em {
+  color: var(--accent);
+}
+.opc-feature .opc-body {
+  color: var(--cream, #dfe8d0);
+  max-width: 520px;
+}
+
+/* ---------- lokasi (dua kolom SEJAJAR / sama tinggi) ---------- */
+.opc-lokasi {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: stretch;
+}
+.opc-info-card {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+}
+.opc-info-card h3 {
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.opc-info-card h3 + p {
+  margin-top: 6px;
+}
+.opc-info-card p {
+  color: var(--text);
+  line-height: 1.6;
+}
+.opc-info-card .opc-info-block + .opc-info-block {
+  margin-top: 20px;
+}
+.opc-info-link {
+  display: inline-block;
+  margin-top: auto;
+  padding-top: 24px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.opc-map {
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  min-height: 340px;
+}
+.opc-map iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 340px;
+  border: 0;
+}
+
+/* ---------- footer ---------- */
+.opc-footer {
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+  padding: 36px 0;
+}
+.opc-footer-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+.opc-footer-links {
+  display: flex;
+  gap: 20px;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.opc-footer-links a {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.opc-footer-links a:hover {
+  color: var(--brand);
+}
+.opc-footer-meta {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 880px) {
+  .opc-nav-links {
+    display: none;
+  }
+  .opc-hero-inner {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+  .opc-poster {
+    order: 2;
+    max-width: 360px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .opc-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .opc-courts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .opc-steps {
+    grid-template-columns: 1fr;
+  }
+  .opc-step-line {
+    display: none;
+  }
+  .opc-lokasi {
+    grid-template-columns: 1fr;
+  }
+  .opc-map,
+  .opc-map iframe {
+    min-height: 280px;
+  }
+  /* stats jadi grid rapi (hindari jejer flush/cramped di mobile) */
+  .opc-hero-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+  .opc-stat-divider {
+    display: none;
+  }
+  .opc-stat-num {
+    font-size: clamp(18px, 5.2vw, 22px);
+  }
+}
+
+@media (max-width: 460px) {
+  .opc-cards {
+    grid-template-columns: 1fr;
+  }
+}

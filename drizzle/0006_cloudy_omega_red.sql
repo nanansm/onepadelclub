@@ -1,0 +1,1 @@
+DROP TABLE "onepadel"."standings" CASCADE;

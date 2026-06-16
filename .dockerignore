@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+.env
+.env*.local
+*.md
+PRD_*.pdf
+logo.jpg
+public/uploads
