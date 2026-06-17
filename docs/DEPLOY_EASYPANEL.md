@@ -91,14 +91,14 @@ Klik **Deploy**. Saat boot otomatis: `migrate-prod` (apply schema) → `next sta
 `instrumentation` jalankan bootstrap (venue + admin). Cek **Logs**: cari
 `[migrate] selesai` dan `[bootstrap] super_admin dibuat`.
 
-## 6. Cron expire-bookings (WAJIB)
+## 6. Expire booking PENDING — OTOMATIS (tanpa cron)
 
-Tanpa ini, slot booking yang belum dibayar terkunci selamanya.
-Easypanel **Cron / Scheduled task** (atau cron eksternal), tiap 5 menit:
-```
-curl -s "https://onepadel.motekreatif.com/api/cron/expire-bookings?secret=<CRON_SECRET>"
-```
-Lama hold diatur operator di `/admin/settings` (default 30 menit).
+Slot yang di-hold (PENDING) lebih lama dari `holdMinutes` otomatis berhenti
+memblok saat ketersediaan dihitung (lazy-expiry di `src/lib/availability.ts`).
+Jadi **tidak perlu cron**. Lama hold diatur owner di `/admin/settings` (default
+30 menit). Endpoint `/api/cron/expire-bookings?secret=<CRON_SECRET>` tetap ada
+sebagai cleanup opsional (mengubah status jadi CANCELLED) kalau mau dijadwalkan,
+tapi tidak wajib untuk slot bebas kembali.
 
 ## 7. Verifikasi pasca-deploy
 
