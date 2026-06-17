@@ -10,11 +10,13 @@ export function ImageUpload({
   prefix,
   defaultUrl,
   label = "Upload foto",
+  onUploaded,
 }: {
   name: string;
   prefix: string;
   defaultUrl?: string | null;
   label?: string;
+  onUploaded?: (url: string) => void;
 }) {
   const [url, setUrl] = useState(defaultUrl ?? "");
   const [busy, setBusy] = useState(false);
@@ -34,6 +36,7 @@ export function ImageUpload({
         return;
       }
       setUrl(j.url);
+      onUploaded?.(j.url);
       toast.success("Foto diupload");
     } catch {
       toast.error("Upload gagal");

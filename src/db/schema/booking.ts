@@ -4,6 +4,7 @@ import {
   date,
   index,
   integer,
+  jsonb,
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
@@ -36,6 +37,47 @@ export const venue = onepadel.table("venue", {
   bankHolder: text("bank_holder"),
   qrisUrl: text("qris_url"),
   paymentNotes: text("payment_notes"),
+  // --- Settings tambahan (Tier 1-8). Semua additive & nullable: null -> pakai
+  // default di src/lib/settings.ts. Owner non-teknis edit lewat /admin/settings.
+  // Kontak ekstra
+  tiktok: text("tiktok"),
+  email: text("email"),
+  phone: text("phone"),
+  // Konten hero + landing
+  tagline: text("tagline"),
+  heroBadge: text("hero_badge"),
+  heroHeadline: text("hero_headline"),
+  heroSubcopy: text("hero_subcopy"),
+  ligaHeadline: text("liga_headline"),
+  ligaBody: text("liga_body"),
+  // Kartu "Cara Main" (4) & aturan Liga (8) — array {title, body}
+  schemes: jsonb("schemes").$type<{ title: string; body: string }[]>(),
+  rules: jsonb("rules").$type<{ title: string; body: string }[]>(),
+  // Branding
+  logoUrl: text("logo_url"),
+  heroImageUrl: text("hero_image_url"),
+  brandPrimary: text("brand_primary"),
+  brandAccent: text("brand_accent"),
+  brandCream: text("brand_cream"),
+  // SEO / meta
+  metaTitle: text("meta_title"),
+  metaDescription: text("meta_description"),
+  ogImageUrl: text("og_image_url"),
+  // Konstanta booking
+  minDuration: integer("min_duration").notNull().default(1),
+  maxDuration: integer("max_duration").notNull().default(6),
+  // Lama slot di-hold (menit) untuk booking PENDING sebelum auto-batal cron.
+  holdMinutes: integer("hold_minutes").notNull().default(30),
+  // --- Notifikasi email (SMTP). Password TIDAK pernah dikirim ke client. ---
+  notifEnabled: boolean("notif_enabled").notNull().default(false),
+  notifyEmail: text("notify_email"), // tujuan alert admin (booking masuk)
+  smtpHost: text("smtp_host"),
+  smtpPort: integer("smtp_port"),
+  smtpSecure: boolean("smtp_secure").notNull().default(false),
+  smtpUser: text("smtp_user"),
+  smtpPassword: text("smtp_password"),
+  smtpFromName: text("smtp_from_name"),
+  smtpFromEmail: text("smtp_from_email"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -71,6 +113,7 @@ export const courtBooking = onepadel.table(
       .references(() => court.id, { onDelete: "restrict" }),
     customerName: text("customer_name").notNull(),
     customerWa: text("customer_wa").notNull(),
+    customerEmail: text("customer_email"),
     // Tanggal main, "YYYY-MM-DD" (WIB).
     date: date("date", { mode: "string" }).notNull(),
     startHour: integer("start_hour").notNull(),
@@ -79,6 +122,8 @@ export const courtBooking = onepadel.table(
     totalPrice: integer("total_price").notNull(),
     status: bookingStatus("status").notNull().default("PENDING"),
     notes: text("notes"),
+    // Asal booking: "web" (online) atau "kasir" (input admin/walk-in).
+    source: text("source").notNull().default("web"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at")
       .notNull()

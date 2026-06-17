@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { asc, eq, gte } from "drizzle-orm";
 import { db } from "@/db";
 import { court, openPlayRegistration, openPlaySession } from "@/db/schema";
 import { getCourts } from "@/lib/venue";
 import { todayJakarta } from "@/lib/tz";
+import { AdminPageHeader } from "@/components/admin/page-header";
 import { OpenPlayAdmin } from "./open-play-admin";
 
 export const dynamic = "force-dynamic";
@@ -49,11 +49,10 @@ export default async function AdminOpenPlayPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Open Play</h1>
-        <Link href="/admin" className="text-sm text-accent">Dashboard</Link>
-      </div>
-      <p className="mt-1 text-sm text-muted">Buat sesi, kelola pendaftaran, konfirmasi pembayaran.</p>
+      <AdminPageHeader
+        title="Open Play"
+        sub="Buat sesi, kelola pendaftaran, konfirmasi pembayaran."
+      />
       <div className="mt-6">
         <OpenPlayAdmin sessions={sessions} courts={courts.map((c) => ({ id: c.id, name: c.name }))} today={today} />
       </div>

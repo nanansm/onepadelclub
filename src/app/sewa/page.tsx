@@ -1,13 +1,25 @@
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { getCourts, getVenue } from "@/lib/venue";
+import { getSettings } from "@/lib/settings";
 import { todayJakarta } from "@/lib/tz";
 import { BookingFlow } from "./booking-flow";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Sewa Lapangan",
+  description:
+    "Booking lapangan padel indoor di One Padel Club Garut. Pilih tanggal & jam, bayar, langsung main — tanpa akun.",
+};
 
 export const dynamic = "force-dynamic";
 
 export default async function SewaPage() {
-  const [venue, courts] = await Promise.all([getVenue(), getCourts()]);
+  const [venue, courts, settings] = await Promise.all([
+    getVenue(),
+    getCourts(),
+    getSettings(),
+  ]);
 
   return (
     <div className="min-h-dvh bg-cream/20">
@@ -49,6 +61,8 @@ export default async function SewaPage() {
               pricePerHour: c.pricePerHour,
             }))}
             today={todayJakarta()}
+            minDuration={settings.minDuration}
+            maxDuration={settings.maxDuration}
           />
         )}
       </main>

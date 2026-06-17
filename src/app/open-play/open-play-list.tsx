@@ -25,6 +25,7 @@ export function OpenPlayList({ sessions }: { sessions: Session[] }) {
   const [openId, setOpenId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [wa, setWa] = useState("");
+  const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   async function submit(sessionId: string) {
@@ -33,6 +34,7 @@ export function OpenPlayList({ sessions }: { sessions: Session[] }) {
       sessionId,
       customerName: name,
       customerWa: wa,
+      customerEmail: email,
     });
     setSubmitting(false);
     if (!res.ok) {
@@ -95,6 +97,7 @@ export function OpenPlayList({ sessions }: { sessions: Session[] }) {
                       setOpenId(s.id);
                       setName("");
                       setWa("");
+                      setEmail("");
                     }}
                     className="rounded-full bg-accent px-5 py-2 text-sm font-semibold text-white transition hover:opacity-90"
                   >
@@ -126,6 +129,19 @@ export function OpenPlayList({ sessions }: { sessions: Session[] }) {
                   onChange={(e) => setWa(e.target.value)}
                   className="w-full rounded-xl border bg-white px-3 py-2.5 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
                 />
+                <div>
+                  <input
+                    type="email"
+                    required
+                    placeholder="email@contoh.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full rounded-xl border bg-white px-3 py-2.5 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+                  />
+                  <p className="mt-1 text-xs text-muted">
+                    Email · konfirmasi dikirim ke sini
+                  </p>
+                </div>
                 <div className="flex gap-2">
                   <button
                     type="submit"

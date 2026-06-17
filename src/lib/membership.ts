@@ -4,6 +4,8 @@ import { db } from "@/db";
 import { membership, membershipPlan } from "@/db/schema";
 import { normalizeWa } from "./booking";
 import { genCode, isUniqueViolation } from "./code";
+import { fireNotify, notifyAdminNewBooking, notifyCustomerBooking } from "./mailer";
+import { rupiah } from "./utils";
 
 export async function getActivePlans() {
   return db
@@ -31,6 +33,12 @@ export const joinMembershipSchema = z.object({
     .min(8, "Nomor WhatsApp tidak valid")
     .transform(normalizeWa)
     .refine((d) => d.length >= 10 && d.length <= 15, "Nomor WhatsApp tidak valid"),
+  customerEmail: z
+    .string()
+    .trim()
+    .email("Email tidak valid")
+    .optional()
+    .or(z.literal("")),
 });
 
 export type JoinResult =
@@ -53,6 +61,7 @@ export async function joinMembership(
           planId: plan.id,
           customerName: input.customerName,
           customerWa: input.customerWa,
+          customerEmail: input.customerEmail ? input.customerEmail : null,
         });
         break;
       } catch (err) {
@@ -60,6 +69,26 @@ export async function joinMembership(
         throw err;
       }
     }
+
+    const detail = `Paket ${plan.name} · ${rupiah(plan.price)}/${plan.durationDays} hari`;
+    fireNotify(() =>
+      notifyAdminNewBooking({
+        jenis: "Membership",
+        kode: code,
+        nama: input.customerName,
+        wa: input.customerWa,
+        detail,
+        invoicePath: `/membership/${code}`,
+      }),
+    );
+    fireNotify(() =>
+      notifyCustomerBooking(input.customerEmail, {
+        jenis: "Membership",
+        kode: code,
+        detail,
+        invoicePath: `/membership/${code}`,
+      }),
+    );
     return { ok: true, code };
   } catch (err) {
     console.error("[joinMembership]", err);

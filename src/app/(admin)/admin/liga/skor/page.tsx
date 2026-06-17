@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { getLeaguesWithLabels, getMatchesWithTeams } from "@/lib/liga";
 import type { MatchView } from "@/components/match-card";
+import { AdminPageHeader } from "@/components/admin/page-header";
 import { SkorEditor } from "./skor-editor";
 
 export const dynamic = "force-dynamic";
@@ -16,13 +16,11 @@ export default async function AdminSkorPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Input Skor</h1>
-        <Link href="/admin/liga" className="text-sm text-accent">Liga</Link>
-      </div>
-      <p className="mt-1 text-sm text-muted">
-        Pilih liga, isi skor, simpan. Klasemen update otomatis.
-      </p>
+      <AdminPageHeader
+        title="Input Skor"
+        sub="Pilih liga, isi skor, simpan. Klasemen update otomatis."
+        back={{ href: "/admin/liga", label: "Liga" }}
+      />
       <div className="mt-6">
         {leagues.length === 0 ? (
           <p className="rounded-2xl border bg-card p-8 text-center text-muted">

@@ -1,9 +1,9 @@
-import Link from "next/link";
 import { asc } from "drizzle-orm";
 import { db } from "@/db";
 import { player, team } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getLeaguesWithLabels } from "@/lib/liga";
+import { AdminPageHeader } from "@/components/admin/page-header";
 import { TimManager } from "./tim-manager";
 
 export const dynamic = "force-dynamic";
@@ -37,11 +37,11 @@ export default async function AdminTimPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Kelola Tim & Pemain</h1>
-        <Link href="/admin/liga" className="text-sm text-accent">Liga</Link>
-      </div>
-      <p className="mt-1 text-sm text-muted">Tambah tim, atur warna, kelola roster pemain.</p>
+      <AdminPageHeader
+        title="Kelola Tim & Pemain"
+        sub="Tambah tim, atur warna, kelola roster pemain."
+        back={{ href: "/admin/liga", label: "Liga" }}
+      />
       <div className="mt-6">
         {leagues.length === 0 ? (
           <p className="rounded-2xl border bg-card p-8 text-center text-muted">Belum ada liga.</p>

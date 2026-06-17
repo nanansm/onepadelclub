@@ -18,17 +18,38 @@ const instrumentSerif = Instrument_Serif({
   display: "swap",
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://onepadelclub.com";
+
 export const metadata: Metadata = {
-  title: "One Padel Club — Main Padel di Garut",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "One Padel Club — Main Padel di Garut",
+    template: "%s · One Padel Club",
+  },
   description:
     "Booking lapangan padel, open play, coaching, dan membership di Garut. Rumah resmi Liga Padel Kota Intan.",
-  icons: { icon: "/brand/logo.jpg" },
+  applicationName: "One Padel Club",
+  openGraph: {
+    type: "website",
+    siteName: "One Padel Club",
+    locale: "id_ID",
+    url: SITE_URL,
+    title: "One Padel Club — Main Padel di Garut",
+    description:
+      "Lapangan padel indoor aesthetic di Garut. Booking lapangan, open play, coaching, membership, dan Liga Padel Kota Intan.",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "One Padel Club — Main Padel di Garut",
+    description:
+      "Lapangan padel indoor aesthetic di Garut. Booking, open play, coaching, membership, dan liga.",
+  },
 };
 
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#ffffff",
+  themeColor: "#1a4d33",
 };
 
 export default function RootLayout({

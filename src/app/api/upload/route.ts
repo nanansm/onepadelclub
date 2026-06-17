@@ -5,7 +5,16 @@ import { uploadImage } from "@/lib/r2";
 export const dynamic = "force-dynamic";
 
 const MAX_BYTES = 5 * 1024 * 1024; // 5MB
-const ALLOWED_PREFIX = new Set(["coach", "team", "player", "qris", "proof"]);
+const ALLOWED_PREFIX = new Set([
+  "coach",
+  "team",
+  "player",
+  "qris",
+  "proof",
+  "logo",
+  "hero",
+  "og",
+]);
 
 export async function POST(req: Request) {
   await requireAdmin();

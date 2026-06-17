@@ -6,6 +6,13 @@ import {
   getKlasemenData,
   getLiveMatchesWithTeams,
 } from "@/lib/liga";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Liga Padel Kota Intan",
+  description:
+    "Klasemen real-time, jadwal, live score, dan profil tim Liga Padel Kota Intan di One Padel Club Garut.",
+};
 
 export const dynamic = "force-dynamic";
 

@@ -7,6 +7,7 @@ const links = [
   { label: "Live", href: "/liga/live" },
   { label: "Hall of Fame", href: "/liga/hall-of-fame" },
   { label: "Regulasi", href: "/liga/regulasi" },
+  { label: "Daftar Tim", href: "/liga/daftar" },
 ];
 
 export function LigaHeader() {

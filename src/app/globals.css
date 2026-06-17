@@ -297,73 +297,100 @@ a {
   min-width: 0;
 }
 
-/* court poster (mirror grafik Coming Soon IG) */
+/* court poster (foto asli main padel) */
 .opc-poster {
   position: relative;
   width: 100%;
   aspect-ratio: 4 / 5;
   border-radius: 26px;
   overflow: hidden;
-  background: linear-gradient(
-    122deg,
-    #1c5238 0%,
-    #1c5238 44%,
-    #efe9da 44%,
-    #efe9da 46.5%,
-    #bb5430 46.5%,
-    #a4471f 100%
-  );
+  background: var(--surface-2);
   box-shadow: 0 30px 70px rgba(20, 36, 27, 0.22);
 }
-.opc-poster-badge {
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 6px 13px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.16);
-  backdrop-filter: blur(6px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #fff;
+.opc-poster-img {
+  object-fit: cover;
 }
-.opc-poster-ball {
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #d7e96a;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
-}
-.opc-poster-center {
+.opc-poster-overlay {
   position: absolute;
   inset: 0;
+  z-index: 1;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  text-align: center;
-  padding: 24px;
-}
-.opc-poster-center img {
-  width: clamp(96px, 22%, 132px);
-  height: auto;
+  align-items: flex-end;
+  padding: 22px;
+  background: linear-gradient(
+    to top,
+    rgba(20, 36, 27, 0.62) 0%,
+    rgba(20, 36, 27, 0.12) 36%,
+    transparent 60%
+  );
 }
 .opc-poster-tagline {
   font-family: var(--font-display);
   font-style: italic;
-  font-size: clamp(15px, 2.2vw, 19px);
-  color: #f4f1e6;
+  font-size: clamp(17px, 2.6vw, 22px);
+  line-height: 1.2;
+  color: #fbf9f2;
   letter-spacing: -0.01em;
-  max-width: 240px;
+  max-width: 260px;
+  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------- galeri / komunitas ---------- */
+.opc-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.opc-gallery-item {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  border-radius: 20px;
+  overflow: hidden;
+  margin: 0;
+  background: var(--surface-2);
+  box-shadow: 0 12px 32px rgba(20, 36, 27, 0.1);
+}
+.opc-gallery-img {
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+.opc-gallery-item:hover .opc-gallery-img {
+  transform: scale(1.04);
+}
+.opc-gallery-cap {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 20px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: #fbf9f2;
+  background: linear-gradient(
+    to top,
+    rgba(20, 36, 27, 0.78) 0%,
+    rgba(20, 36, 27, 0.18) 42%,
+    transparent 64%
+  );
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.35);
+}
+.opc-gallery-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--accent) 88%, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #fff;
+  text-shadow: none;
 }
 .opc-stat-num {
   font-size: clamp(20px, 5vw, 24px);
@@ -667,6 +694,13 @@ a {
   .opc-cards {
     grid-template-columns: repeat(2, 1fr);
   }
+  .opc-gallery {
+    grid-template-columns: 1fr 1fr;
+  }
+  .opc-gallery-item:first-child {
+    grid-column: 1 / -1;
+    aspect-ratio: 16 / 11;
+  }
   .opc-courts {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -701,5 +735,11 @@ a {
 @media (max-width: 460px) {
   .opc-cards {
     grid-template-columns: 1fr;
+  }
+  .opc-gallery {
+    grid-template-columns: 1fr;
+  }
+  .opc-gallery-item:first-child {
+    aspect-ratio: 4 / 5;
   }
 }

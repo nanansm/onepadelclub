@@ -3,6 +3,13 @@ import { SiteHeader } from "@/components/site-header";
 import { PageHeading } from "@/components/page-heading";
 import { getActivePlans } from "@/lib/membership";
 import { PlanList } from "./plan-list";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Membership",
+  description:
+    "Paket member One Padel Club Garut dengan harga khusus dan benefit rutin main tiap bulan.",
+};
 
 export const dynamic = "force-dynamic";
 

@@ -10,6 +10,11 @@ export const matchStatus = onepadel.enum("match_status", [
   "WO",
 ]);
 export const playerPosition = onepadel.enum("player_position", ["INTI", "CADANGAN"]);
+export const teamRegStatus = onepadel.enum("team_reg_status", [
+  "PENDING",
+  "APPROVED",
+  "REJECTED",
+]);
 
 export const season = onepadel.table("season", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -132,7 +137,27 @@ export const hallOfFame = onepadel.table("hall_of_fame", {
   note: text("note"),
 });
 
+// Pendaftaran tim Liga (self-serve dari /liga/daftar). Antri approve admin.
+// Bukan tabel `team` langsung — admin yang assign ke league saat approve.
+export const teamRegistration = onepadel.table("team_registration", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  teamName: text("team_name").notNull(),
+  categoryId: text("category_id").references(() => category.id, {
+    onDelete: "set null",
+  }),
+  categoryLabel: text("category_label"), // snapshot nama kategori saat daftar
+  player1Name: text("player1_name").notNull(),
+  player2Name: text("player2_name").notNull(),
+  captainWa: text("captain_wa").notNull(),
+  captainEmail: text("captain_email"),
+  note: text("note"),
+  status: teamRegStatus("status").notNull().default("PENDING"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  reviewedAt: timestamp("reviewed_at"),
+});
+
 export type Season = typeof season.$inferSelect;
+export type TeamRegistration = typeof teamRegistration.$inferSelect;
 export type Category = typeof category.$inferSelect;
 export type League = typeof league.$inferSelect;
 export type Team = typeof team.$inferSelect;

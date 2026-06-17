@@ -15,6 +15,7 @@ const planSchema = z.object({
   name: z.string().trim().min(2).max(60),
   price: z.coerce.number().int().min(0),
   durationDays: z.coerce.number().int().min(1).max(3650),
+  discountPercent: z.coerce.number().int().min(0).max(100).default(0),
   benefits: z.string().trim().max(1000).optional().or(z.literal("")),
 });
 
@@ -26,6 +27,7 @@ export async function createPlanAction(raw: unknown): Promise<Result> {
     name: p.data.name,
     price: p.data.price,
     durationDays: p.data.durationDays,
+    discountPercent: p.data.discountPercent,
     benefits: p.data.benefits || null,
   });
   revalidatePath("/admin/membership");
@@ -37,10 +39,10 @@ export async function updatePlanAction(raw: unknown): Promise<Result> {
   const schema = planSchema.extend({ id: z.string().min(1) });
   const p = schema.safeParse(raw);
   if (!p.success) return { ok: false, error: p.error.issues[0]?.message ?? "Data tidak valid" };
-  const { id, name, price, durationDays, benefits } = p.data;
+  const { id, name, price, durationDays, discountPercent, benefits } = p.data;
   await db
     .update(membershipPlan)
-    .set({ name, price, durationDays, benefits: benefits || null })
+    .set({ name, price, durationDays, discountPercent, benefits: benefits || null })
     .where(eq(membershipPlan.id, id));
   revalidatePath("/admin/membership");
   return { ok: true };

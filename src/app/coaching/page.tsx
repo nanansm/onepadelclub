@@ -2,13 +2,24 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { PageHeading } from "@/components/page-heading";
 import { getActiveCoaches } from "@/lib/coaching";
+import { getSettings } from "@/lib/settings";
 import { todayJakarta } from "@/lib/tz";
 import { CoachingFlow } from "./coaching-flow";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Coaching / Klinik",
+  description:
+    "Latihan padel bareng pelatih berpengalaman di One Padel Club Garut. Pilih pelatih, tanggal, dan jam yang cocok.",
+};
 
 export const dynamic = "force-dynamic";
 
 export default async function CoachingPage() {
-  const coaches = await getActiveCoaches();
+  const [coaches, settings] = await Promise.all([
+    getActiveCoaches(),
+    getSettings(),
+  ]);
 
   return (
     <div className="min-h-dvh bg-cream/20">
@@ -36,6 +47,8 @@ export default async function CoachingPage() {
               ratePerHour: c.ratePerHour,
             }))}
             today={todayJakarta()}
+            minDuration={settings.minDuration}
+            maxDuration={settings.maxDuration}
           />
         )}
       </main>

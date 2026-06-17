@@ -8,12 +8,22 @@ import {
 } from "@/lib/coaching";
 import type { HourSlot } from "@/lib/booking-constants";
 import { guardGuest } from "@/lib/rate-limit";
+import { getActiveMembershipByWa } from "@/lib/lookup";
 
 export async function getCoachAvailabilityAction(
   coachId: string,
   date: string,
 ): Promise<HourSlot[]> {
   return getCoachAvailability(coachId, date);
+}
+
+// Cek membership aktif berdasarkan WA (dipakai badge member + diskon di coaching flow).
+export async function checkCoachMembershipAction(
+  wa: string,
+): Promise<{ planName: string; discountPercent: number } | null> {
+  const m = await getActiveMembershipByWa(wa);
+  if (!m) return null;
+  return { planName: m.planName, discountPercent: m.discountPercent };
 }
 
 export async function createCoachingAction(

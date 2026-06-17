@@ -57,6 +57,34 @@
       "when": 1781621377956,
       "tag": "0007_third_nemesis",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1781667820872,
+      "tag": "0008_lethal_elektra",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1781669799134,
+      "tag": "0009_slimy_jackpot",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1781671042242,
+      "tag": "0010_lowly_thunderball",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1781672715056,
+      "tag": "0011_wooden_scalphunter",
+      "breakpoints": true
     }
   ]
 }

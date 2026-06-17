@@ -9,6 +9,8 @@ import {
 import { todayJakarta } from "./tz";
 import { normalizeWa } from "./booking";
 import { genCode, isUniqueViolation } from "./code";
+import { fireNotify, notifyAdminNewBooking, notifyCustomerBooking } from "./mailer";
+import { hourLabel } from "./format";
 
 const ACTIVE_REG = ["PENDING", "PAID"] as const;
 
@@ -56,6 +58,12 @@ export const registerOpenPlaySchema = z.object({
     .min(8, "Nomor WhatsApp tidak valid")
     .transform(normalizeWa)
     .refine((d) => d.length >= 10 && d.length <= 15, "Nomor WhatsApp tidak valid"),
+  customerEmail: z
+    .string()
+    .trim()
+    .email("Email tidak valid")
+    .optional()
+    .or(z.literal("")),
 });
 
 export type RegisterResult =
@@ -66,7 +74,7 @@ export async function registerOpenPlay(
   input: z.infer<typeof registerOpenPlaySchema>,
 ): Promise<RegisterResult> {
   try {
-    const code = await db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       // Serialize per sesi agar kuota tidak kelebihan saat ramai.
       await tx.execute(
         sql`select pg_advisory_xact_lock(hashtext(${"openplay:" + input.sessionId}))`,
@@ -94,6 +102,7 @@ export async function registerOpenPlay(
           ),
         );
       if (Number(taken) >= s.maxPlayers) throw new RegError("Kuota sesi sudah penuh.");
+      const info = { title: s.title, date: s.date, startHour: s.startHour };
 
       let code = "";
       for (let i = 0; i < 5; i++) {
@@ -104,6 +113,7 @@ export async function registerOpenPlay(
             sessionId: s.id,
             customerName: input.customerName,
             customerWa: input.customerWa,
+            customerEmail: input.customerEmail ? input.customerEmail : null,
           });
           break;
         } catch (err) {
@@ -119,8 +129,29 @@ export async function registerOpenPlay(
           .set({ status: "FULL" })
           .where(eq(openPlaySession.id, s.id));
       }
-      return code;
+      return { code, info };
     });
+
+    const { code, info } = result;
+    const detail = `${info.title} · ${info.date} · ${hourLabel(info.startHour)}`;
+    fireNotify(() =>
+      notifyAdminNewBooking({
+        jenis: "Open Play",
+        kode: code,
+        nama: input.customerName,
+        wa: input.customerWa,
+        detail,
+        invoicePath: `/open-play/${code}`,
+      }),
+    );
+    fireNotify(() =>
+      notifyCustomerBooking(input.customerEmail, {
+        jenis: "Open Play",
+        kode: code,
+        detail,
+        invoicePath: `/open-play/${code}`,
+      }),
+    );
     return { ok: true, code };
   } catch (err) {
     if (err instanceof RegError) return { ok: false, error: err.message };

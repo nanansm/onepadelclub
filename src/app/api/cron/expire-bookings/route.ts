@@ -7,20 +7,21 @@ import {
   openPlayRegistration,
   openPlaySession,
 } from "@/db/schema";
+import { getSettings } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 
-const PENDING_TTL_MS = 2 * 60 * 60 * 1000; // 2 jam
-
 // Dipanggil cron Easypanel: GET /api/cron/expire-bookings?secret=$CRON_SECRET
 // Membatalkan booking PENDING terbengkalai supaya slot tak terkunci selamanya.
+// Lama hold = settings.holdMinutes (diatur owner di /admin/settings, default 30 menit).
 export async function GET(req: Request) {
   const secret = new URL(req.url).searchParams.get("secret");
   if (!process.env.CRON_SECRET || secret !== process.env.CRON_SECRET) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const cutoff = new Date(Date.now() - PENDING_TTL_MS);
+  const { holdMinutes } = await getSettings();
+  const cutoff = new Date(Date.now() - holdMinutes * 60 * 1000);
 
   const [rentals, coachings, regs] = await Promise.all([
     db

@@ -8,6 +8,11 @@ import { normalizeWa } from "./booking";
 import { MAX_DURATION, MIN_DURATION, type HourSlot } from "./booking-constants";
 import { overlaps } from "./availability";
 import { genCode, isUniqueViolation } from "./code";
+import { getSettings } from "./settings";
+import { getActiveMembershipByWa, applyMemberDiscount } from "./lookup";
+import { fireNotify, notifyAdminNewBooking, notifyCustomerBooking } from "./mailer";
+import { rupiah } from "./utils";
+import { rangeLabel } from "./format";
 
 const BLOCKING = ["PENDING", "PAID"] as const;
 
@@ -72,6 +77,12 @@ export const createCoachingSchema = z.object({
     .min(8, "Nomor WhatsApp tidak valid")
     .transform(normalizeWa)
     .refine((d) => d.length >= 10 && d.length <= 15, "Nomor WhatsApp tidak valid"),
+  customerEmail: z
+    .string()
+    .trim()
+    .email("Email tidak valid")
+    .optional()
+    .or(z.literal("")),
   notes: z.string().trim().max(280).optional().or(z.literal("")),
 });
 
@@ -88,6 +99,17 @@ export async function createCoachingBooking(
   const c = await getCoachById(input.coachId);
   if (!c || !c.active) return { ok: false, error: "Pelatih tidak ditemukan." };
 
+  // Batas durasi yang dikonfigurasi owner (di-clamp ke batas absolut 1..6).
+  const settings = await getSettings();
+  const minDur = Math.max(MIN_DURATION, Math.min(settings.minDuration, MAX_DURATION));
+  const maxDur = Math.max(minDur, Math.min(settings.maxDuration, MAX_DURATION));
+  if (input.duration < minDur || input.duration > maxDur) {
+    return {
+      ok: false,
+      error: `Durasi coaching harus antara ${minDur}-${maxDur} jam.`,
+    };
+  }
+
   if (
     input.startHour < venue.openHour ||
     input.startHour + input.duration > venue.closeHour
@@ -98,7 +120,12 @@ export async function createCoachingBooking(
     return { ok: false, error: "Slot sudah lewat." };
   }
 
-  const totalPrice = c.ratePerHour * input.duration;
+  // Harga = rate * durasi, diskon otomatis kalau WA = member aktif.
+  const basePrice = c.ratePerHour * input.duration;
+  const member = await getActiveMembershipByWa(input.customerWa);
+  const totalPrice = member
+    ? applyMemberDiscount(basePrice, member.discountPercent)
+    : basePrice;
 
   try {
     const code = await db.transaction(async (tx) => {
@@ -129,6 +156,7 @@ export async function createCoachingBooking(
             coachId: input.coachId,
             customerName: input.customerName,
             customerWa: input.customerWa,
+            customerEmail: input.customerEmail ? input.customerEmail : null,
             date: input.date,
             startHour: input.startHour,
             duration: input.duration,
@@ -143,6 +171,29 @@ export async function createCoachingBooking(
       }
       return code;
     });
+
+    // Notifikasi (fire-and-forget, tak memblok response).
+    const detail = `${c.name} · ${input.date} · ${rangeLabel(input.startHour, input.duration)}`;
+    fireNotify(() =>
+      notifyAdminNewBooking({
+        jenis: "Coaching",
+        kode: code,
+        nama: input.customerName,
+        wa: input.customerWa,
+        detail,
+        total: rupiah(totalPrice),
+        invoicePath: `/coaching/${code}`,
+      }),
+    );
+    fireNotify(() =>
+      notifyCustomerBooking(input.customerEmail, {
+        jenis: "Coaching",
+        kode: code,
+        detail,
+        total: rupiah(totalPrice),
+        invoicePath: `/coaching/${code}`,
+      }),
+    );
     return { ok: true, code };
   } catch (err) {
     if (err instanceof CoachError) return { ok: false, error: err.message };

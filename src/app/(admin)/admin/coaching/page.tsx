@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { asc, eq, gte } from "drizzle-orm";
 import { db } from "@/db";
 import { coach, coachingBooking } from "@/db/schema";
 import { todayJakarta } from "@/lib/tz";
+import { AdminPageHeader } from "@/components/admin/page-header";
 import { CoachingAdmin } from "./coaching-admin";
 
 export const dynamic = "force-dynamic";
@@ -20,11 +20,10 @@ export default async function AdminCoachingPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">Coaching</h1>
-        <Link href="/admin" className="text-sm text-accent">Dashboard</Link>
-      </div>
-      <p className="mt-1 text-sm text-muted">Kelola pelatih dan booking coaching.</p>
+      <AdminPageHeader
+        title="Coaching"
+        sub="Kelola pelatih dan booking coaching."
+      />
       <div className="mt-6">
         <CoachingAdmin
           coaches={coaches.map((c) => ({

@@ -1,8 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import type { Court, Venue } from "@/db/schema";
+import type { Court } from "@/db/schema";
 import { rupiah } from "@/lib/utils";
+import {
+  type Settings,
+  hoursLabel,
+  hoursShort,
+  instagramUrl,
+  tiktokUrl,
+} from "@/lib/settings";
 
 function SectionTag({ children }: { children: ReactNode }) {
   return (
@@ -13,11 +20,11 @@ function SectionTag({ children }: { children: ReactNode }) {
   );
 }
 
-function Logo() {
+function Logo({ logoUrl }: { logoUrl?: string }) {
   return (
     <Link href="/" className="opc-logo">
       <Image
-        src="/brand/logo.jpg"
+        src={logoUrl || "/brand/logo.jpg"}
         alt="One Padel Club"
         width={34}
         height={34}
@@ -28,11 +35,11 @@ function Logo() {
   );
 }
 
-export function LandingNav() {
+export function LandingNav({ settings }: { settings: Settings }) {
   return (
     <header className="opc-nav">
       <div className="opc-container opc-nav-inner">
-        <Logo />
+        <Logo logoUrl={settings.logoUrl} />
         <nav className="opc-nav-links">
           <a href="#skema">Cara Main</a>
           <a href="#lapangan">Lapangan</a>
@@ -52,9 +59,11 @@ export function LandingNav() {
 export function Hero({
   courtCount,
   priceFrom,
+  settings,
 }: {
   courtCount: number;
   priceFrom: number;
+  settings: Settings;
 }) {
   return (
     <section className="opc-hero">
@@ -62,16 +71,12 @@ export function Hero({
         <div className="opc-hero-copy">
           <span className="opc-badge">
             <span className="opc-badge-dot" />
-            Segera Buka · Garut
+            {settings.heroBadge}
           </span>
-          <h1 className="opc-h1">
-            Lapangan padel indoor di <em>Kota Garut.</em>
-          </h1>
-          <p className="opc-tagline">One Court, One Community, One Game</p>
+          <h1 className="opc-h1">{settings.heroHeadline}</h1>
+          <p className="opc-tagline">{settings.tagline}</p>
           <p className="opc-body" style={{ maxWidth: 520 }}>
-            Empat lapangan indoor dengan suasana aesthetic — tempat main
-            sekaligus nongkrong. Booking lapangan, open play, coaching, dan
-            membership dari satu tempat.
+            {settings.heroSubcopy}
           </p>
           <div className="opc-hero-actions">
             <Link className="opc-btn opc-btn-primary" href="/sewa">
@@ -88,7 +93,7 @@ export function Hero({
             </div>
             <div className="opc-stat-divider" />
             <div className="opc-stat">
-              <div className="opc-stat-num">07–23</div>
+              <div className="opc-stat-num">{hoursShort(settings)}</div>
               <div className="opc-stat-label">buka tiap hari</div>
             </div>
             <div className="opc-stat-divider" />
@@ -100,20 +105,16 @@ export function Hero({
         </div>
 
         <div className="opc-poster">
-          <span className="opc-poster-badge">Coming Soon</span>
-          <span className="opc-poster-ball" style={{ top: "28%", right: "20%" }} />
-          <span className="opc-poster-ball" style={{ bottom: "24%", left: "18%" }} />
-          <div className="opc-poster-center">
-            <Image
-              src="/brand/logo-white.png"
-              alt="One Padel Club"
-              width={132}
-              height={132}
-              unoptimized
-            />
-            <span className="opc-poster-tagline">
-              One Court, One Community, One Game
-            </span>
+          <Image
+            src={settings.heroImageUrl || "/img1.jpg"}
+            alt="Main padel di One Padel Club Garut"
+            fill
+            priority
+            sizes="(max-width: 880px) 90vw, 460px"
+            className="opc-poster-img"
+          />
+          <div className="opc-poster-overlay">
+            <span className="opc-poster-tagline">{settings.tagline}</span>
           </div>
         </div>
       </div>
@@ -123,38 +124,15 @@ export function Hero({
 
 /* ---------- cara main ---------- */
 
-const schemes = [
-  {
-    num: "01",
-    title: "Sewa Lapangan",
-    body: "Pilih tanggal dan jam kosong, bayar, langsung main. Tanpa akun.",
-    href: "/sewa",
-    cta: "Booking sekarang",
-  },
-  {
-    num: "02",
-    title: "Open Play / Mabar",
-    body: "Gabung sesi main bareng sesuai level. Daftar per kursi, kuota terbatas.",
-    href: "/open-play",
-    cta: "Lihat jadwal",
-  },
-  {
-    num: "03",
-    title: "Coaching / Klinik",
-    body: "Latihan bareng pelatih berpengalaman. Pilih pelatih dan jam yang cocok.",
-    href: "/coaching",
-    cta: "Cari pelatih",
-  },
-  {
-    num: "04",
-    title: "Membership",
-    body: "Paket member dengan harga khusus dan benefit rutin main tiap bulan.",
-    href: "/membership",
-    cta: "Lihat paket",
-  },
+const SCHEME_HREFS = ["/sewa", "/open-play", "/coaching", "/membership"];
+const SCHEME_CTAS = [
+  "Booking sekarang",
+  "Lihat jadwal",
+  "Cari pelatih",
+  "Lihat paket",
 ];
 
-export function SchemesSection() {
+export function SchemesSection({ settings }: { settings: Settings }) {
   return (
     <section className="opc-section" id="skema">
       <div className="opc-container">
@@ -165,14 +143,19 @@ export function SchemesSection() {
           </h2>
         </div>
         <div className="opc-cards">
-          {schemes.map((s) => (
-            <Link className="opc-card" key={s.num} href={s.href}>
-              <span className="opc-card-num">{s.num}</span>
-              <span className="opc-card-title">{s.title}</span>
-              <p className="opc-card-body">{s.body}</p>
-              <span className="opc-card-link">{s.cta} &rarr;</span>
-            </Link>
-          ))}
+          {settings.schemes.map((s, i) => {
+            const num = String(i + 1).padStart(2, "0");
+            const href = SCHEME_HREFS[i] ?? "/sewa";
+            const cta = SCHEME_CTAS[i] ?? "Selengkapnya";
+            return (
+              <Link className="opc-card" key={num} href={href}>
+                <span className="opc-card-num">{num}</span>
+                <span className="opc-card-title">{s.title}</span>
+                <p className="opc-card-body">{s.body}</p>
+                <span className="opc-card-link">{cta} &rarr;</span>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -224,6 +207,65 @@ export function StepsSection() {
   );
 }
 
+/* ---------- komunitas / galeri ---------- */
+
+const GALLERY = [
+  {
+    src: "/img3.jpg",
+    alt: "Lapangan padel indoor aesthetic di One Padel Club",
+    tag: "Venue",
+    caption: "Lapangan indoor aesthetic, nyaman buat main maupun nongkrong.",
+  },
+  {
+    src: "/img2.jpg",
+    alt: "Pemenang turnamen padel di One Padel Club",
+    tag: "Turnamen",
+    caption: "Event & turnamen rutin — dari mabar santai sampai liga resmi.",
+  },
+  {
+    src: "/img4.jpg",
+    alt: "Komunitas padel One Padel Club Garut",
+    tag: "Komunitas",
+    caption: "Ratusan pemain dari berbagai level main bareng tiap minggu.",
+  },
+];
+
+export function CommunitySection() {
+  return (
+    <section className="opc-section" id="komunitas">
+      <div className="opc-container">
+        <div className="opc-center-head">
+          <SectionTag>Suasana & Komunitas</SectionTag>
+          <h2 className="opc-h2">
+            Bukan cuma lapangan — <em>ini rumah komunitas.</em>
+          </h2>
+          <p className="opc-body" style={{ maxWidth: 560 }}>
+            Tempat ratusan pemain padel Garut ketemu, main bareng, dan
+            berkembang. Datang sendiri pun bakal pulang bawa teman baru.
+          </p>
+        </div>
+        <div className="opc-gallery">
+          {GALLERY.map((g) => (
+            <figure className="opc-gallery-item" key={g.src}>
+              <Image
+                src={g.src}
+                alt={g.alt}
+                fill
+                sizes="(max-width: 880px) 90vw, 360px"
+                className="opc-gallery-img"
+              />
+              <figcaption className="opc-gallery-cap">
+                <span className="opc-gallery-tag">{g.tag}</span>
+                <span>{g.caption}</span>
+              </figcaption>
+            </figure>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 /* ---------- lapangan & harga ---------- */
 
 export function CourtsSection({ courts }: { courts: Court[] }) {
@@ -260,19 +302,14 @@ export function CourtsSection({ courts }: { courts: Court[] }) {
 
 /* ---------- liga ---------- */
 
-export function LigaSection() {
+export function LigaSection({ settings }: { settings: Settings }) {
   return (
     <section className="opc-section">
       <div className="opc-container">
         <div className="opc-feature">
           <SectionTag>Liga Padel Kota Intan</SectionTag>
-          <h2 className="opc-h2 opc-h2-big">
-            Kompetisi. Komunitas. <em>Kemenangan.</em>
-          </h2>
-          <p className="opc-body">
-            Liga berjenjang dengan klasemen real-time, jadwal, live score, dan
-            profil tim. Ikuti perjalanan tim favoritmu.
-          </p>
+          <h2 className="opc-h2 opc-h2-big">{settings.ligaHeadline}</h2>
+          <p className="opc-body">{settings.ligaBody}</p>
           <Link className="opc-btn opc-btn-primary" href="/liga">
             Lihat Klasemen
           </Link>
@@ -284,8 +321,9 @@ export function LigaSection() {
 
 /* ---------- lokasi ---------- */
 
-export function LokasiSection({ venue }: { venue: Venue }) {
-  const igUrl = venue.instagram ? `https://instagram.com/${venue.instagram}` : null;
+export function LokasiSection({ settings }: { settings: Settings }) {
+  const igUrl = instagramUrl(settings);
+  const ttUrl = tiktokUrl(settings);
   return (
     <section className="opc-section opc-section-alt" id="lokasi">
       <div className="opc-container">
@@ -299,12 +337,19 @@ export function LokasiSection({ venue }: { venue: Venue }) {
           <div className="opc-info-card">
             <div className="opc-info-block">
               <h3>Alamat</h3>
-              <p>{venue.address}</p>
+              <p>{settings.address}</p>
             </div>
             <div className="opc-info-block">
               <h3>Jam Operasional</h3>
-              <p>Setiap hari, 07.00 - 23.00 WIB</p>
+              <p>{hoursLabel(settings)}</p>
             </div>
+            {settings.phone || settings.email ? (
+              <div className="opc-info-block">
+                <h3>Kontak</h3>
+                {settings.phone ? <p>{settings.phone}</p> : null}
+                {settings.email ? <p>{settings.email}</p> : null}
+              </div>
+            ) : null}
             {igUrl ? (
               <a
                 className="opc-info-link"
@@ -312,15 +357,25 @@ export function LokasiSection({ venue }: { venue: Venue }) {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Ikuti @{venue.instagram} di Instagram &rarr;
+                Ikuti @{settings.instagram.replace(/^@/, "")} di Instagram &rarr;
+              </a>
+            ) : null}
+            {ttUrl ? (
+              <a
+                className="opc-info-link"
+                href={ttUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Ikuti @{settings.tiktok.replace(/^@/, "")} di TikTok &rarr;
               </a>
             ) : null}
           </div>
-          {venue.mapsUrl ? (
+          {settings.mapsUrl ? (
             <div className="opc-map">
               <iframe
                 title="Lokasi One Padel Club"
-                src={venue.mapsUrl}
+                src={settings.mapsUrl}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
               />
@@ -334,13 +389,13 @@ export function LokasiSection({ venue }: { venue: Venue }) {
 
 /* ---------- footer ---------- */
 
-export function LandingFooter({ venue }: { venue: Venue }) {
-  const igUrl = venue.instagram ? `https://instagram.com/${venue.instagram}` : null;
+export function LandingFooter({ settings }: { settings: Settings }) {
+  const igUrl = instagramUrl(settings);
   return (
     <footer className="opc-footer">
       <div className="opc-container opc-footer-inner">
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <Logo />
+          <Logo logoUrl={settings.logoUrl} />
           <span
             style={{
               fontFamily: "var(--font-instrument), Georgia, serif",
@@ -349,7 +404,7 @@ export function LandingFooter({ venue }: { venue: Venue }) {
               color: "var(--muted)",
             }}
           >
-            One Court, One Community, One Game
+            {settings.tagline}
           </span>
         </div>
         <nav className="opc-footer-links">
@@ -357,6 +412,8 @@ export function LandingFooter({ venue }: { venue: Venue }) {
           <a href="#lapangan">Lapangan</a>
           <a href="#lokasi">Lokasi</a>
           <Link href="/liga">Liga</Link>
+          <Link href="/cek">Cek Booking</Link>
+          <Link href="/liga/daftar">Daftar Liga</Link>
           {igUrl ? (
             <a href={igUrl} target="_blank" rel="noopener noreferrer">
               Instagram
@@ -364,8 +421,8 @@ export function LandingFooter({ venue }: { venue: Venue }) {
           ) : null}
         </nav>
         <div className="opc-footer-meta">
-          <div>{venue.address}</div>
-          <div>Buka 07.00 - 23.00 WIB</div>
+          <div>{settings.address}</div>
+          <div>{hoursLabel(settings)}</div>
           <div>&copy; {new Date().getFullYear()} One Padel Club</div>
         </div>
       </div>

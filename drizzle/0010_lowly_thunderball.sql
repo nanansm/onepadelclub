@@ -1,0 +1,1 @@
+ALTER TABLE "onepadel"."membership_plan" ADD COLUMN "discount_percent" integer DEFAULT 0 NOT NULL;

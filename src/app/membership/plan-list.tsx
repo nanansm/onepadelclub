@@ -19,6 +19,7 @@ export function PlanList({ plans }: { plans: Plan[] }) {
   const [openId, setOpenId] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [wa, setWa] = useState("");
+  const [email, setEmail] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   async function submit(planId: string) {
@@ -27,6 +28,7 @@ export function PlanList({ plans }: { plans: Plan[] }) {
       planId,
       customerName: name,
       customerWa: wa,
+      customerEmail: email,
     });
     setSubmitting(false);
     if (!res.ok) {
@@ -92,6 +94,19 @@ export function PlanList({ plans }: { plans: Plan[] }) {
                   onChange={(e) => setWa(e.target.value)}
                   className="w-full rounded-xl border bg-white px-3 py-2.5 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
                 />
+                <div>
+                  <input
+                    type="email"
+                    required
+                    placeholder="email@contoh.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full rounded-xl border bg-white px-3 py-2.5 outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+                  />
+                  <p className="mt-1 text-xs text-muted">
+                    Email · konfirmasi dikirim ke sini
+                  </p>
+                </div>
                 <button
                   type="submit"
                   disabled={submitting}
@@ -106,6 +121,7 @@ export function PlanList({ plans }: { plans: Plan[] }) {
                   setOpenId(p.id);
                   setName("");
                   setWa("");
+                  setEmail("");
                 }}
                 className={cn(
                   "mt-5 w-full rounded-full px-4 py-3 font-semibold transition hover:opacity-90",

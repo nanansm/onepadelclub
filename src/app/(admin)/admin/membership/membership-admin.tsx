@@ -18,6 +18,7 @@ type Plan = {
   price: number;
   durationDays: number;
   benefits: string | null;
+  discountPercent: number;
   active: boolean;
 };
 type Member = {
@@ -73,6 +74,7 @@ export function MembershipAdmin({
                   name: fd.get("name"),
                   price: fd.get("price"),
                   durationDays: fd.get("durationDays"),
+                  discountPercent: fd.get("discountPercent"),
                   benefits: fd.get("benefits"),
                 }),
               "Paket ditambahkan",
@@ -84,6 +86,7 @@ export function MembershipAdmin({
             <input name="name" required placeholder="Nama paket" className={inputClass} />
             <input name="price" type="number" required min={0} step={10000} placeholder="Harga" className={inputClass} />
             <input name="durationDays" type="number" required min={1} defaultValue={30} placeholder="Durasi (hari)" className={inputClass} />
+            <input name="discountPercent" type="number" min={0} max={100} defaultValue={0} placeholder="Diskon booking (%)" className={inputClass} />
             <textarea name="benefits" placeholder="Benefit (satu per baris)" rows={3} className={`${inputClass} sm:col-span-3`} />
             <button type="submit" disabled={busy} className="rounded-lg bg-brand px-4 py-2 font-medium text-brand-fg disabled:opacity-50 sm:col-span-3">Tambah Paket</button>
           </div>
@@ -102,6 +105,7 @@ export function MembershipAdmin({
                           name: fd.get("name"),
                           price: fd.get("price"),
                           durationDays: fd.get("durationDays"),
+                          discountPercent: fd.get("discountPercent"),
                           benefits: fd.get("benefits"),
                         }),
                       "Paket diperbarui",
@@ -112,6 +116,7 @@ export function MembershipAdmin({
                   <input name="name" defaultValue={p.name} required className={inputClass} />
                   <input name="price" type="number" defaultValue={p.price} required className={inputClass} />
                   <input name="durationDays" type="number" defaultValue={p.durationDays} required className={inputClass} />
+                  <input name="discountPercent" type="number" min={0} max={100} defaultValue={p.discountPercent} placeholder="Diskon (%)" className={inputClass} />
                   <textarea name="benefits" defaultValue={p.benefits ?? ""} rows={3} className={`${inputClass} sm:col-span-3`} />
                   <div className="flex gap-2 sm:col-span-3">
                     <button type="submit" disabled={busy} className="rounded-lg bg-brand px-3 py-2 text-sm font-medium text-brand-fg disabled:opacity-50">Simpan</button>
@@ -126,7 +131,14 @@ export function MembershipAdmin({
                     <span className="font-semibold">{p.name}</span>
                     {!p.active ? <span className="rounded-full bg-border px-2 py-0.5 text-xs text-muted">Nonaktif</span> : null}
                   </div>
-                  <p className="text-sm text-muted">{rupiah(p.price)} / {p.durationDays} hari</p>
+                  <p className="text-sm text-muted">
+                    {rupiah(p.price)} / {p.durationDays} hari
+                    {p.discountPercent > 0 ? (
+                      <span className="ml-2 rounded-full bg-accent/10 px-2 py-0.5 text-xs font-medium text-accent">
+                        diskon {p.discountPercent}% booking
+                      </span>
+                    ) : null}
+                  </p>
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => setEditingId(p.id)} className="rounded-lg border px-3 py-1.5 text-sm font-medium hover:bg-cream/40">Edit</button>
