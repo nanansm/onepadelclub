@@ -1,4 +1,5 @@
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, gte, inArray, or, type SQL } from "drizzle-orm";
+import type { AnyPgColumn } from "drizzle-orm/pg-core";
 import { db } from "@/db";
 import {
   coachingBooking,
@@ -6,8 +7,9 @@ import {
   openPlaySession,
   type Venue,
 } from "@/db/schema";
+import { getSettings } from "./settings";
 import { jakartaParts, todayJakarta } from "./tz";
-import { BLOCKING_STATUSES, type HourSlot } from "./booking-constants";
+import { type HourSlot } from "./booking-constants";
 
 export { BLOCKING_STATUSES, MIN_DURATION, MAX_DURATION } from "./booking-constants";
 export type { HourSlot } from "./booking-constants";
@@ -35,6 +37,22 @@ async function getBookedRanges(
   date: string,
   exec: Exec = db,
 ): Promise<BookedRange[]> {
+  // Lazy-expiry (anti-stuck tanpa cron): booking PENDING yang lebih tua dari
+  // holdMinutes dianggap kedaluwarsa dan TIDAK lagi memblok slot. PAID selalu
+  // memblok. Slot otomatis kebuka begitu hold lewat, walau cron tak jalan.
+  const { holdMinutes } = await getSettings();
+  const cutoff = new Date(Date.now() - holdMinutes * 60 * 1000);
+
+  // status='PAID' OR (status='PENDING' AND createdAt >= cutoff)
+  const stillBlocks = (
+    statusCol: AnyPgColumn,
+    createdCol: AnyPgColumn,
+  ): SQL | undefined =>
+    or(
+      eq(statusCol, "PAID"),
+      and(eq(statusCol, "PENDING"), gte(createdCol, cutoff)),
+    );
+
   const [rentals, sessions, coachings] = await Promise.all([
     exec
       .select({ startHour: courtBooking.startHour, duration: courtBooking.duration })
@@ -43,7 +61,7 @@ async function getBookedRanges(
         and(
           eq(courtBooking.courtId, courtId),
           eq(courtBooking.date, date),
-          inArray(courtBooking.status, [...BLOCKING_STATUSES]),
+          stillBlocks(courtBooking.status, courtBooking.createdAt),
         ),
       ),
     exec
@@ -64,7 +82,7 @@ async function getBookedRanges(
         and(
           eq(coachingBooking.courtId, courtId),
           eq(coachingBooking.date, date),
-          inArray(coachingBooking.status, [...BLOCKING_STATUSES]),
+          stillBlocks(coachingBooking.status, coachingBooking.createdAt),
         ),
       ),
   ]);
