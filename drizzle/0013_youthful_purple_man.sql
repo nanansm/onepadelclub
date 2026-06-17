@@ -1,0 +1,1 @@
+ALTER TABLE "onepadel"."venue" ADD COLUMN "gallery" jsonb;

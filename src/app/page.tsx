@@ -14,6 +14,7 @@ import {
   StepsSection,
   CommunitySection,
   CourtsSection,
+  FacilitiesSection,
   LigaSection,
   LokasiSection,
   LandingFooter,
@@ -70,9 +71,10 @@ export default async function Home() {
         settings={settings}
       />
       <SchemesSection settings={settings} />
-      <CommunitySection />
+      <CommunitySection settings={settings} />
       <StepsSection />
       {courts.length > 0 ? <CourtsSection courts={courts} /> : null}
+      <FacilitiesSection settings={settings} />
       <LigaSection settings={settings} />
       <LokasiSection settings={settings} />
       <LandingFooter settings={settings} />

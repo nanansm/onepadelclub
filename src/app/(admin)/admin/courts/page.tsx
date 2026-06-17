@@ -17,7 +17,7 @@ export default async function AdminCourtsPage() {
       <AdminPageHeader
         title="Kelola"
         accent="Lapangan"
-        sub="Atur nama, tipe, harga per jam, dan status aktif lapangan."
+        sub="Atur nama, tipe, permukaan, harga per jam, dan status aktif lapangan."
       />
 
       <div className="mt-6">
@@ -26,6 +26,7 @@ export default async function AdminCourtsPage() {
             id: c.id,
             name: c.name,
             type: c.type,
+            surface: c.surface,
             pricePerHour: c.pricePerHour,
             active: c.active,
           }))}

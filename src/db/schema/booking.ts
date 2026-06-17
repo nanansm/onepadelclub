@@ -43,6 +43,12 @@ export const venue = onepadel.table("venue", {
   tiktok: text("tiktok"),
   email: text("email"),
   phone: text("phone"),
+  // Fasilitas klub — array {icon, label}. null -> pakai DEFAULT_FACILITIES.
+  facilities: jsonb("facilities").$type<{ icon: string; label: string }[]>(),
+  // Galeri suasana/komunitas — array {src, tag, caption}. null -> DEFAULT_GALLERY.
+  gallery: jsonb("gallery").$type<
+    { src: string; tag: string; caption: string }[]
+  >(),
   // Konten hero + landing
   tagline: text("tagline"),
   heroBadge: text("hero_badge"),
@@ -92,6 +98,8 @@ export const court = onepadel.table(
       .references(() => venue.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
     type: courtType("type").notNull().default("INDOOR"),
+    // Permukaan lapangan (mis. "Premium Synthetic Grass"). null -> tak ditampilkan.
+    surface: text("surface"),
     pricePerHour: integer("price_per_hour").notNull(),
     active: boolean("active").notNull().default(true),
     sortOrder: integer("sort_order").notNull().default(0),

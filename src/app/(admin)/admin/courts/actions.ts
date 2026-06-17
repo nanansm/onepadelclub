@@ -12,6 +12,7 @@ type ActionResult = { ok: boolean; error?: string };
 const courtSchema = z.object({
   name: z.string().trim().min(1, "Nama wajib").max(60),
   type: z.enum(["INDOOR", "OUTDOOR"]),
+  surface: z.string().trim().max(60).optional().default(""),
   pricePerHour: z.coerce.number().int().min(1000, "Harga tidak valid"),
 });
 
@@ -24,7 +25,11 @@ export async function createCourtAction(raw: unknown): Promise<ActionResult> {
   const v = (await db.select({ id: venue.id }).from(venue).limit(1))[0];
   if (!v) return { ok: false, error: "Venue belum dikonfigurasi" };
 
-  await db.insert(court).values({ ...parsed.data, venueId: v.id });
+  await db.insert(court).values({
+    ...parsed.data,
+    surface: parsed.data.surface || null,
+    venueId: v.id,
+  });
   revalidatePath("/admin/courts");
   return { ok: true };
 }
@@ -38,7 +43,10 @@ export async function updateCourtAction(raw: unknown): Promise<ActionResult> {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Data tidak valid" };
   }
   const { id, ...data } = parsed.data;
-  await db.update(court).set(data).where(eq(court.id, id));
+  await db
+    .update(court)
+    .set({ ...data, surface: data.surface || null })
+    .where(eq(court.id, id));
   revalidatePath("/admin/courts");
   return { ok: true };
 }

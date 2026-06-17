@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Panduan Pengguna — One Padel Club</title>
+<style>
+  :root{
+    --green:#1a4d33; --green-d:#123626; --orange:#d97721; --cream:#dfe8d0;
+    --ink:#1f2d24; --muted:#5f6f64; --line:#e2e8dd; --bg:#f5f7f2;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:var(--ink);background:#fff;font-size:11px;line-height:1.5}
+  @page{size:A4;margin:0}
+
+  .page{position:relative;width:210mm;height:297mm;padding:16mm 15mm 14mm;overflow:hidden;page-break-after:always;background:#fff;display:flex;flex-direction:column}
+  .page:last-child{page-break-after:auto}
+
+  /* ---------- COVER ---------- */
+  .cover{background:linear-gradient(160deg,var(--green) 0%,var(--green-d) 100%);color:#fff;justify-content:space-between;padding:24mm 18mm}
+  .cover .top{display:flex;align-items:center;gap:12px}
+  .cover .top img{width:54px;height:54px;object-fit:contain}
+  .cover .top span{font-weight:700;letter-spacing:.5px;font-size:15px}
+  .cover .mid h1{font-size:46px;line-height:1.08;font-weight:800;letter-spacing:-.5px}
+  .cover .mid h1 em{font-style:normal;color:var(--orange)}
+  .cover .mid p{margin-top:14px;font-size:15px;color:var(--cream);max-width:120mm}
+  .cover .rule{width:70px;height:5px;background:var(--orange);border-radius:3px;margin:22px 0}
+  .cover .bot{font-size:12px;color:#bcd0c0}
+  .cover .badge{display:inline-block;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);padding:5px 12px;border-radius:30px;font-size:11px;margin-bottom:10px;color:#fff}
+
+  /* ---------- HEADERS ---------- */
+  .phead{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--line);padding-bottom:8px;margin-bottom:14px}
+  .phead .l{display:flex;align-items:center;gap:9px}
+  .phead .l img{width:24px;height:24px;object-fit:contain}
+  .phead .l b{font-size:12px;color:var(--green);letter-spacing:.3px}
+  .phead .r{font-size:10px;color:var(--muted)}
+
+  .sec-tag{display:inline-flex;align-items:center;gap:7px;background:var(--cream);color:var(--green);font-weight:700;font-size:11px;padding:5px 12px;border-radius:30px;margin-bottom:8px}
+  .sec-tag .n{background:var(--orange);color:#fff;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:10px}
+  h2.title{font-size:23px;font-weight:800;letter-spacing:-.3px;margin-bottom:4px}
+  h2.title em{font-style:normal;color:var(--orange)}
+  .lead{color:var(--muted);font-size:11.5px;margin-bottom:12px;max-width:150mm}
+
+  /* ---------- TWO COLUMN (text + phone) ---------- */
+  .split{display:flex;gap:14px;flex:1;align-items:flex-start}
+  .split .txt{flex:1;padding-top:2px}
+  .split .shot{width:62mm;flex:none;display:flex;justify-content:center}
+
+  .phone{border:7px solid #14241b;border-radius:24px;overflow:hidden;background:#14241b;box-shadow:0 8px 22px rgba(20,36,27,.22);width:100%}
+  .phone img{display:block;width:100%}
+
+  /* steps */
+  ol.steps{list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:11px}
+  ol.steps li{counter-increment:s;position:relative;padding-left:30px}
+  ol.steps li::before{content:counter(s);position:absolute;left:0;top:-1px;width:21px;height:21px;background:var(--green);color:#fff;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  ol.steps li b{display:block;font-size:12px;margin-bottom:1px}
+  ol.steps li span{color:var(--muted);font-size:11px}
+
+  .note{margin-top:13px;background:#fff8ef;border:1px solid #f3dcc0;border-left:3px solid var(--orange);border-radius:8px;padding:9px 11px;font-size:10.5px;color:#7a4a16}
+  .note b{color:var(--orange)}
+
+  .tip{margin-top:10px;background:#f0f5ec;border:1px solid var(--line);border-radius:8px;padding:9px 11px;font-size:10.5px;color:var(--green)}
+
+  /* gallery (multiple phones) */
+  .gallery{display:flex;gap:12px;justify-content:center;flex:1;align-items:center}
+  .gallery .phone{width:50mm}
+  .gcap{text-align:center;margin-top:6px;font-size:10px;color:var(--muted);font-weight:600}
+  .gitem{display:flex;flex-direction:column;align-items:center}
+
+  /* footer */
+  .pfoot{position:absolute;left:15mm;right:15mm;bottom:8mm;display:flex;justify-content:space-between;font-size:9px;color:var(--muted);border-top:1px solid var(--line);padding-top:6px}
+
+  ul.bul{list-style:none;display:flex;flex-direction:column;gap:7px;margin-top:4px}
+  ul.bul li{padding-left:16px;position:relative;font-size:11px}
+  ul.bul li::before{content:"";position:absolute;left:0;top:6px;width:7px;height:7px;border-radius:50%;background:var(--orange)}
+  ul.bul li b{color:var(--ink)}
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<section class="page cover">
+  <div class="top">
+    <img src="assets/logo-white.png" alt="logo">
+    <span>ONE PADEL CLUB</span>
+  </div>
+  <div class="mid">
+    <span class="badge">Panduan untuk Pemain &amp; Member</span>
+    <h1>Cara Pakai<br><em>Aplikasi</em> One<br>Padel Club</h1>
+    <div class="rule"></div>
+    <p>Booking lapangan, ikut open play, ambil kelas coaching, jadi member, sampai ikut Liga Kota Intan — semua dari HP, tanpa perlu login.</p>
+  </div>
+  <div class="bot">
+    Panduan Pengguna · Versi 1.0<br>
+    One Court, One Community, One Game
+  </div>
+</section>
+
+<!-- ============ INTRO ============ -->
+<section class="page">
+  <div class="phead"><div class="l"><img src="assets/logo-black.png"><b>ONE PADEL CLUB</b></div><div class="r">Panduan Pengguna</div></div>
+  <span class="sec-tag"><span class="n">i</span> Sekilas</span>
+  <h2 class="title">Apa yang bisa <em>kamu lakukan?</em></h2>
+  <p class="lead">One Padel Club adalah satu aplikasi untuk semua kebutuhan main padel di Garut. Buka lewat browser HP — tidak perlu install, tidak perlu daftar akun untuk booking.</p>
+
+  <div class="split">
+    <div class="txt">
+      <ul class="bul">
+        <li><b>Sewa Lapangan</b> — pilih lapangan, tanggal, jam, langsung dapat kode booking.</li>
+        <li><b>Open Play / Mabar</b> — gabung sesi main bareng sesuai level, bayar per orang.</li>
+        <li><b>Coaching / Klinik</b> — latihan bareng pelatih bersertifikat.</li>
+        <li><b>Membership</b> — paket member dengan harga khusus &amp; benefit.</li>
+        <li><b>Liga Kota Intan</b> — lihat klasemen, jadwal, skor live, &amp; daftarkan timmu.</li>
+      </ul>
+      <div class="tip"><b>Tanpa login.</b> Untuk booking cukup isi nama &amp; nomor WhatsApp. Akun hanya dibutuhkan oleh admin/panitia.</div>
+      <div class="note"><b>Akses:</b> buka alamat web One Padel Club di browser HP (Chrome/Safari). Simpan ke layar utama agar gampang dibuka lagi.</div>
+    </div>
+    <div class="shot"><div class="phone"><img src="screenshots/user/user-01-landing.png"></div></div>
+  </div>
+  <div class="pfoot"><span>One Padel Club — Panduan Pengguna</span><span>Halaman 2</span></div>
+</section>
+
+<!-- ============ BOOKING ============ -->
+<section class="page">
+  <div class="phead"><div class="l"><img src="assets/logo-black.png"><b>ONE PADEL CLUB</b></div><div class="r">Sewa Lapangan</div></div>
+  <span class="sec-tag"><span class="n">1</span> Booking Lapangan</span>
+  <h2 class="title">Sewa <em>lapangan</em> dalam 4 langkah</h2>
+  <p class="lead">Dari menu <b>Sewa Lapangan</b>, kamu bisa pesan slot kapan saja. Sistem otomatis menyembunyikan jam yang sudah dipesan.</p>
+
+  <div class="split">
+    <div class="txt">
+      <ol class="steps">
+        <li><b>Pilih tanggal</b><span>Geser daftar tanggal, pilih hari mainmu.</span></li>
+        <li><b>Pilih lapangan</b><span>Court 1–4, harga per jam tampil jelas (Indoor).</span></li>
+        <li><b>Pilih jam</b><span>Slot abu-abu = sudah dipesan. Pilih jam yang tersedia.</span></li>
+        <li><b>Isi data &amp; konfirmasi</b><span>Masukkan nama + nomor WhatsApp, lalu dapatkan kode booking.</span></li>
+      </ol>
+      <div class="tip">Mode <b>Per Lapangan</b> atau <b>Per Jam</b> bisa dipilih sesuai kebutuhanmu di bagian atas halaman.</div>
+    </div>
+    <div class="shot"><div class="phone"><img src="screenshots/user/user-02-sewa.png"></div></div>
+  </div>
+  <div class="pfoot"><span>One Padel Club — Panduan Pengguna</span><span>Halaman 3</span></div>
+</section>
+
+<!-- ============ PEMBAYARAN ============ -->
+<section class="page">
+  <div class="phead"><div class="l"><img src="assets/logo-black.png"><b>ONE PADEL CLUB</b></div><div class="r">Bayar &amp; Konfirmasi</div></div>
+  <span class="sec-tag"><span class="n">2</span> Pembayaran</span>
+  <h2 class="title">Bayar &amp; <em>konfirmasi</em> booking</h2>
+  <p class="lead">Setelah booking dibuat, slot di-<b>hold</b> sementara. Selesaikan pembayaran sebelum waktu hold habis agar slot tidak terbuka lagi.</p>
+
+  <div class="split">
+    <div class="txt">
+      <ol class="steps">
+        <li><b>Catat kode booking</b><span>Contoh: OPC-QZCKJ8. Simpan untuk cek status.</span></li>
+        <li><b>Transfer sesuai total</b><span>Ke rekening bank yang tertera (atau scan QRIS).</span></li>
+        <li><b>Kirim bukti via WhatsApp</b><span>Tekan tombol "Konfirmasi &amp; Kirim Bukti via WhatsApp".</span></li>
+        <li><b>Tunggu verifikasi admin</b><span>Booking berubah jadi "Lunas / Terkonfirmasi".</span></li>
+      </ol>
+      <div class="note"><b>Penting:</b> chat admin DULU untuk konfirmasi, lalu transfer. Booking dikonfirmasi setelah pembayaran diverifikasi.</div>
+      <div class="tip">Mau cek booking lama? Tekan <b>Cek Booking</b> di pojok kanan atas dan masukkan kodenya.</div>
+    </div>
+    <div class="shot"><div class="phone"><img src="screenshots/user/user-03-invoice.png"></div></div>
+  </div>
+  <div class="pfoot"><span>One Padel Club — Panduan Pengguna</span><span>Halaman 4</span></div>
+</section>
+
+<!-- ============ OPEN PLAY + COACHING ============ -->
+<section class="page">
+  <div class="phead"><div class="l"><img src="assets/logo-black.png"><b>ONE PADEL CLUB</b></div><div class="r">Open Play &amp; Coaching</div></div>
+  <span class="sec-tag"><span class="n">3</span> Main Bareng &amp; Latihan</span>
+  <h2 class="title">Open Play &amp; <em>Coaching</em></h2>
+  <p class="lead">Belum punya lawan? Gabung <b>Open Play (Mabar)</b>. Mau jago? Ambil sesi <b>Coaching</b> bareng pelatih. Keduanya bayar manual seperti booking biasa.</p>
+
+  <div class="gallery">
+    <div class="gitem">
+      <div class="phone"><img src="screenshots/user/user-05-openplay.png"></div>
+      <div class="gcap">Open Play — pilih sesi, lihat sisa slot &amp; harga/orang, lalu Daftar.</div>
+    </div>
+    <div class="gitem">
+      <div class="phone"><img src="screenshots/user/user-06-coaching.png"></div>
+      <div class="gcap">Coaching — pilih pelatih, tanggal, &amp; jam yang tersedia.</div>
+    </div>
+  </div>
+  <div class="tip" style="margin-top:14px">Setiap sesi menampilkan <b>level</b> (Beginner/Intermediate) dan <b>sisa slot</b> secara real-time, jadi kamu tahu apakah masih bisa ikut.</div>
+  <div class="pfoot"><span>One Padel Club — Panduan Pengguna</span><span>Halaman 5</span></div>
+</section>
+
+<!-- ============ MEMBERSHIP ============ -->
+<section class="page">
+  <div class="phead"><div class="l"><img src="assets/logo-black.png"><b>ONE PADEL CLUB</b></div><div class="r">Membership</div></div>
+  <span class="sec-tag"><span class="n">4</span> Jadi Member</span>
+  <h2 class="title">Daftar <em>Membership</em></h2>
+  <p class="lead">Sering main? Paket membership memberi harga khusus &amp; benefit. Pilih paket, isi data, lalu konfirmasi via WhatsApp seperti booking.</p>
+
+  <div class="split">
+    <div class="txt">
+      <ol class="steps">
+        <li><b>Buka menu Membership</b><span>Lihat semua paket aktif + harga &amp; durasi.</span></li>
+        <li><b>Pilih paket</b><span>Baca benefit tiap paket sebelum memilih.</span></li>
+        <li><b>Isi data &amp; konfirmasi</b><span>Nama + WhatsApp, lalu kirim konfirmasi ke admin.</span></li>
+        <li><b>Aktivasi oleh admin</b><span>Membership aktif setelah pembayaran diverifikasi.</span></li>
+      </ol>
+      <div class="tip">Benefit &amp; durasi tiap paket diatur langsung oleh One Padel Club dan bisa berubah sewaktu-waktu.</div>
+    </div>
+    <div class="shot"><div class="phone"><img src="screenshots/user/user-04-membership.png"></div></div>
+  </div>
+  <div class="pfoot"><span>One Padel Club — Panduan Pengguna</span><span>Halaman 6</span></div>
+</section>
+
+<!-- ============ LIGA - LIHAT ============ -->
+<section class="page">
+  <div class="phead"><div class="l"><img src="assets/logo-black.png"><b>ONE PADEL CLUB</b></div><div class="r">Liga Kota Intan</div></div>
+  <span class="sec-tag"><span class="n">5</span> Liga Kota Intan</span>
+  <h2 class="title">Pantau <em>klasemen</em> &amp; skor live</h2>
+  <p class="lead">Liga Padel Kota Intan punya halaman sendiri: klasemen per kategori, jadwal, skor live yang auto-refresh, hall of fame, dan regulasi.</p>
+
+  <div class="gallery">
+    <div class="gitem">
+      <div class="phone"><img src="screenshots/user/user-08-klasemen.png"></div>
+      <div class="gcap">Klasemen — update otomatis tiap skor masuk. Zona promosi/degradasi ditandai warna.</div>
+    </div>
+    <div class="gitem">
+      <div class="phone"><img src="screenshots/user/user-10-live.png"></div>
+      <div class="gcap">Live Score — match yang sedang berlangsung, refresh tiap 15 detik.</div>
+    </div>
+  </div>
+  <div class="tip" style="margin-top:14px">Ada <b>kategori</b> berbeda (Upper Beginner Pria/Wanita, Bronze, dst.) dengan <b>Liga 1 &amp; Liga 2</b>. Pilih tab kategori untuk melihat klasemen masing-masing.</div>
+  <div class="pfoot"><span>One Padel Club — Panduan Pengguna</span><span>Halaman 7</span></div>
+</section>
+
+<!-- ============ LIGA - DAFTAR ============ -->
+<section class="page">
+  <div class="phead"><div class="l"><img src="assets/logo-black.png"><b>ONE PADEL CLUB</b></div><div class="r">Daftar Tim Liga</div></div>
+  <span class="sec-tag"><span class="n">6</span> Ikut Liga</span>
+  <h2 class="title">Daftarkan <em>tim</em> kamu</h2>
+  <p class="lead">Mau ikut Liga Kota Intan? Isi formulir pendaftaran tim. Admin akan meninjau lalu menghubungi kapten via WhatsApp untuk konfirmasi &amp; deposit.</p>
+
+  <div class="split">
+    <div class="txt">
+      <ol class="steps">
+        <li><b>Isi nama tim</b><span>Bebas, contoh: "Smash Bros".</span></li>
+        <li><b>Pilih kategori (opsional)</b><span>Atau biar admin yang menentukan.</span></li>
+        <li><b>Isi 2 nama pemain</b><span>Padel main ganda — 2 pemain per tim.</span></li>
+        <li><b>No WhatsApp kapten</b><span>Untuk dihubungi soal konfirmasi &amp; jadwal.</span></li>
+        <li><b>Kirim pendaftaran</b><span>Tunggu admin meninjau &amp; menghubungi.</span></li>
+      </ol>
+      <div class="note"><b>Deposit Rp100.000</b> diatur via WhatsApp setelah pendaftaran disetujui admin.</div>
+    </div>
+    <div class="shot"><div class="phone"><img src="screenshots/user/user-09-daftar.png"></div></div>
+  </div>
+  <div class="pfoot"><span>One Padel Club — Panduan Pengguna</span><span>Halaman 8</span></div>
+</section>
+
+<!-- ============ PENUTUP ============ -->
+<section class="page cover" style="justify-content:center;text-align:center;align-items:center">
+  <div>
+    <img src="assets/logo-white.png" style="width:64px;height:64px;object-fit:contain;margin-bottom:18px">
+    <h1 style="font-size:34px;font-weight:800;color:#fff">Sampai jumpa<br>di <em style="font-style:normal;color:var(--orange)">lapangan!</em></h1>
+    <div class="rule" style="margin:22px auto"></div>
+    <p style="color:var(--cream);font-size:14px;max-width:120mm;margin:0 auto">Ada kendala booking? Hubungi admin lewat tombol WhatsApp di setiap halaman. Tim One Padel Club siap bantu.</p>
+    <p style="color:#bcd0c0;font-size:11px;margin-top:26px">One Court, One Community, One Game</p>
+  </div>
+</section>
+
+</body>
+</html>

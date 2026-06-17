@@ -4,7 +4,14 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { ImageUpload } from "@/components/image-upload";
-import type { Settings, SchemeItem, RuleItem } from "@/lib/settings";
+import type {
+  Settings,
+  SchemeItem,
+  RuleItem,
+  FacilityItem,
+  GalleryItem,
+} from "@/lib/settings";
+import { FACILITY_ICON_OPTIONS, facilityIcon } from "@/lib/facility-icons";
 import { updateSettingsAction, sendTestEmailAction } from "./actions";
 
 const inputClass =
@@ -77,6 +84,14 @@ export function SettingsForm({ settings }: { settings: Settings }) {
   // Kartu & aturan
   const [schemes, setSchemes] = useState<SchemeItem[]>(settings.schemes);
   const [rules, setRules] = useState<RuleItem[]>(settings.rules);
+
+  // Fasilitas
+  const [facilities, setFacilities] = useState<FacilityItem[]>(
+    settings.facilities,
+  );
+
+  // Galeri
+  const [gallery, setGallery] = useState<GalleryItem[]>(settings.gallery);
 
   // Branding
   const [logoUrl, setLogoUrl] = useState(settings.logoUrl);
@@ -183,6 +198,119 @@ export function SettingsForm({ settings }: { settings: Settings }) {
     );
   }
 
+  function FacilitiesEditor() {
+    return (
+      <div className="space-y-2">
+        {facilities.map((f, i) => {
+          const Icon = facilityIcon(f.icon);
+          return (
+            <div key={i} className="flex items-center gap-2">
+              <Icon className="size-5 shrink-0 text-brand" aria-hidden />
+              <select
+                value={f.icon}
+                onChange={(e) =>
+                  setFacilities(
+                    facilities.map((it, idx) =>
+                      idx === i ? { ...it, icon: e.target.value } : it,
+                    ),
+                  )
+                }
+                className={`${inputClass} max-w-[160px]`}
+              >
+                {FACILITY_ICON_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </select>
+              <input
+                value={f.label}
+                onChange={(e) =>
+                  setFacilities(
+                    facilities.map((it, idx) =>
+                      idx === i ? { ...it, label: e.target.value } : it,
+                    ),
+                  )
+                }
+                placeholder="Nama fasilitas"
+                className={inputClass}
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  setFacilities(facilities.filter((_, idx) => idx !== i))
+                }
+                className="shrink-0 rounded-lg border px-3 py-2 text-sm font-medium hover:bg-cream/40"
+              >
+                Hapus
+              </button>
+            </div>
+          );
+        })}
+        <button
+          type="button"
+          onClick={() =>
+            setFacilities([...facilities, { icon: "cafe", label: "" }])
+          }
+          className="rounded-lg border px-3 py-2 text-sm font-medium hover:bg-cream/40"
+        >
+          Tambah fasilitas
+        </button>
+      </div>
+    );
+  }
+
+  function GalleryEditor() {
+    const patch = (i: number, p: Partial<GalleryItem>) =>
+      setGallery(gallery.map((it, idx) => (idx === i ? { ...it, ...p } : it)));
+    return (
+      <div className="space-y-3">
+        {gallery.map((g, i) => (
+          <div key={i} className="space-y-2 rounded-lg border bg-white p-3">
+            <ImageUpload
+              name={`gallery-${i}`}
+              prefix="gallery"
+              defaultUrl={g.src}
+              label="Upload foto galeri"
+              onUploaded={(url) => patch(i, { src: url })}
+            />
+            <div className="flex items-center gap-2">
+              <input
+                value={g.tag}
+                onChange={(e) => patch(i, { tag: e.target.value })}
+                placeholder="Label (Venue / Turnamen / Komunitas)"
+                className={`${inputClass} max-w-[220px]`}
+              />
+              <button
+                type="button"
+                onClick={() => setGallery(gallery.filter((_, idx) => idx !== i))}
+                className="shrink-0 rounded-lg border px-3 py-2 text-sm font-medium hover:bg-cream/40"
+              >
+                Hapus
+              </button>
+            </div>
+            <textarea
+              value={g.caption}
+              onChange={(e) => patch(i, { caption: e.target.value })}
+              placeholder="Keterangan foto"
+              rows={2}
+              className={inputClass}
+            />
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() =>
+            setGallery([...gallery, { src: "", tag: "", caption: "" }])
+          }
+          className="rounded-lg border px-3 py-2 text-sm font-medium hover:bg-cream/40"
+        >
+          Tambah foto
+        </button>
+      </div>
+    );
+  }
+
   function save() {
     const obj = {
       name,
@@ -208,6 +336,8 @@ export function SettingsForm({ settings }: { settings: Settings }) {
       ligaBody,
       schemes,
       rules,
+      facilities,
+      gallery,
       logoUrl,
       heroImageUrl,
       brandPrimary,
@@ -361,6 +491,14 @@ export function SettingsForm({ settings }: { settings: Settings }) {
       {/* Aturan Liga */}
       <Section title="Aturan Liga">
         <ItemEditor items={rules} setItems={setRules} addLabel="Tambah aturan" />
+      </Section>
+
+      <Section title="Fasilitas">
+        <FacilitiesEditor />
+      </Section>
+
+      <Section title="Galeri Foto">
+        <GalleryEditor />
       </Section>
 
       {/* Branding */}

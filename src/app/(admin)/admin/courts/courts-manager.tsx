@@ -14,6 +14,7 @@ type CourtRow = {
   id: string;
   name: string;
   type: "INDOOR" | "OUTDOOR";
+  surface: string | null;
   pricePerHour: number;
   active: boolean;
 };
@@ -53,6 +54,7 @@ export function CourtsManager({ courts }: { courts: CourtRow[] }) {
               createCourtAction({
                 name: formData.get("name"),
                 type: formData.get("type"),
+                surface: formData.get("surface"),
                 pricePerHour: formData.get("pricePerHour"),
               }),
             "Lapangan ditambahkan",
@@ -61,12 +63,17 @@ export function CourtsManager({ courts }: { courts: CourtRow[] }) {
         className="rounded-2xl border bg-card p-4"
       >
         <h2 className="mb-3 text-sm font-semibold text-muted">Tambah Lapangan</h2>
-        <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_auto_auto]">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_1fr_auto_auto]">
           <input name="name" required placeholder="Nama (Court D)" className={inputClass} />
           <select name="type" className={inputClass} defaultValue="INDOOR">
             <option value="INDOOR">Indoor</option>
             <option value="OUTDOOR">Outdoor</option>
           </select>
+          <input
+            name="surface"
+            placeholder="Permukaan (Premium Synthetic Grass)"
+            className={inputClass}
+          />
           <input
             name="pricePerHour"
             type="number"
@@ -99,18 +106,25 @@ export function CourtsManager({ courts }: { courts: CourtRow[] }) {
                         id: c.id,
                         name: formData.get("name"),
                         type: formData.get("type"),
+                        surface: formData.get("surface"),
                         pricePerHour: formData.get("pricePerHour"),
                       }),
                     "Lapangan diperbarui",
                   );
                 }}
-                className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_auto_auto_auto]"
+                className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto_1fr_auto_auto_auto]"
               >
                 <input name="name" defaultValue={c.name} required className={inputClass} />
                 <select name="type" defaultValue={c.type} className={inputClass}>
                   <option value="INDOOR">Indoor</option>
                   <option value="OUTDOOR">Outdoor</option>
                 </select>
+                <input
+                  name="surface"
+                  defaultValue={c.surface ?? ""}
+                  placeholder="Permukaan"
+                  className={inputClass}
+                />
                 <input
                   name="pricePerHour"
                   type="number"
@@ -151,8 +165,9 @@ export function CourtsManager({ courts }: { courts: CourtRow[] }) {
                   )}
                 </div>
                 <p className="text-sm text-muted">
-                  {c.type === "INDOOR" ? "Indoor" : "Outdoor"} ·{" "}
-                  {rupiah(c.pricePerHour)}/jam
+                  {c.type === "INDOOR" ? "Indoor" : "Outdoor"}
+                  {c.surface ? ` · ${c.surface}` : ""} · {rupiah(c.pricePerHour)}
+                  /jam
                 </p>
               </div>
               <div className="flex gap-2">

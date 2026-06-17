@@ -50,6 +50,23 @@ const settingsSchema = z.object({
   ligaBody: z.string().trim().optional().default(""),
   schemes: z.array(itemSchema).default([]),
   rules: z.array(itemSchema).default([]),
+  facilities: z
+    .array(
+      z.object({
+        icon: z.string().trim().default("cafe"),
+        label: z.string().trim().default(""),
+      }),
+    )
+    .default([]),
+  gallery: z
+    .array(
+      z.object({
+        src: z.string().trim().default(""),
+        tag: z.string().trim().default(""),
+        caption: z.string().trim().default(""),
+      }),
+    )
+    .default([]),
   // branding
   logoUrl: z.string().trim().optional().default(""),
   heroImageUrl: z.string().trim().optional().default(""),
@@ -87,6 +104,10 @@ export async function updateSettingsAction(raw: unknown): Promise<ActionResult> 
   const { smtpPassword, ...rest } = parsed.data;
   const data = {
     ...rest,
+    // Buang baris fasilitas tanpa label biar tak render chip kosong.
+    facilities: rest.facilities.filter((f) => f.label.trim().length > 0),
+    // Buang slide galeri tanpa gambar.
+    gallery: rest.gallery.filter((g) => g.src.trim().length > 0),
     ...(smtpPassword && smtpPassword.length > 0 ? { smtpPassword } : {}),
   };
 

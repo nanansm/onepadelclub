@@ -39,11 +39,12 @@ async function seedVenue() {
         "Transfer ke rekening di atas, lalu kirim bukti ke WhatsApp admin. Booking dikonfirmasi setelah pembayaran diverifikasi.",
     })
     .returning();
+  const grass = "Premium Synthetic Grass";
   await db.insert(court).values([
-    { venueId: v.id, name: "Court 1", type: "INDOOR", pricePerHour: 175000, sortOrder: 1 },
-    { venueId: v.id, name: "Court 2", type: "INDOOR", pricePerHour: 175000, sortOrder: 2 },
-    { venueId: v.id, name: "Court 3", type: "INDOOR", pricePerHour: 200000, sortOrder: 3 },
-    { venueId: v.id, name: "Court 4", type: "INDOOR", pricePerHour: 275000, sortOrder: 4 },
+    { venueId: v.id, name: "Court 1 Hijau", type: "INDOOR", surface: grass, pricePerHour: 175000, sortOrder: 1 },
+    { venueId: v.id, name: "Court 2 Teracotta", type: "INDOOR", surface: grass, pricePerHour: 175000, sortOrder: 2 },
+    { venueId: v.id, name: "Court 3 Hijau", type: "INDOOR", surface: grass, pricePerHour: 200000, sortOrder: 3 },
+    { venueId: v.id, name: "Court 4 Teracotta", type: "INDOOR", surface: grass, pricePerHour: 275000, sortOrder: 4 },
   ]);
   console.log("[seed] venue + 4 lapangan dibuat.");
 }

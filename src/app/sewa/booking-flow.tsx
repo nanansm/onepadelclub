@@ -33,6 +33,7 @@ type CourtOption = {
   id: string;
   name: string;
   type: "INDOOR" | "OUTDOOR";
+  surface: string | null;
   pricePerHour: number;
 };
 
@@ -310,8 +311,11 @@ export function BookingFlow({
             >
               <span className="block font-medium">{c.name}</span>
               <span className="block text-xs text-muted">
-                {c.type === "INDOOR" ? "Indoor" : "Outdoor"}
+                Padel · {c.type === "INDOOR" ? "Indoor" : "Outdoor"}
               </span>
+              {c.surface ? (
+                <span className="block text-[11px] text-muted">{c.surface}</span>
+              ) : null}
               <span className="mt-1 block text-sm font-semibold text-brand">
                 {rupiah(c.pricePerHour)}
                 <span className="text-xs font-normal text-muted">/jam</span>

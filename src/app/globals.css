@@ -496,6 +496,11 @@ a {
   color: var(--muted);
   margin-top: 2px;
 }
+.opc-court-surface {
+  font-size: 11.5px;
+  color: var(--muted);
+  margin-top: 4px;
+}
 .opc-court-price {
   font-size: 22px;
   font-weight: 800;
@@ -510,6 +515,40 @@ a {
 .opc-courts-cta {
   text-align: center;
   margin-top: clamp(28px, 5vw, 40px);
+}
+
+/* ---------- fasilitas ---------- */
+.opc-facilities {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-width: 920px;
+  margin-inline: auto;
+}
+.opc-facility {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  font-size: 15px;
+  font-weight: 600;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.opc-facility:hover {
+  border-color: color-mix(in oklab, var(--accent) 45%, var(--line));
+  transform: translateY(-2px);
+}
+.opc-facility-icon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  color: var(--accent);
 }
 
 /* ---------- cara booking (steps) ---------- */
@@ -702,6 +741,9 @@ a {
     aspect-ratio: 16 / 11;
   }
   .opc-courts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .opc-facilities {
     grid-template-columns: repeat(2, 1fr);
   }
   .opc-steps {

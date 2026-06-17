@@ -11,6 +11,8 @@ import { venue, type Venue } from "@/db/schema";
 
 export type SchemeItem = { title: string; body: string };
 export type RuleItem = { title: string; body: string };
+export type FacilityItem = { icon: string; label: string };
+export type GalleryItem = { src: string; tag: string; caption: string };
 
 export type Settings = {
   // identitas & kontak
@@ -40,6 +42,8 @@ export type Settings = {
   ligaBody: string;
   schemes: SchemeItem[];
   rules: RuleItem[];
+  facilities: FacilityItem[];
+  gallery: GalleryItem[];
   // branding
   logoUrl: string;
   heroImageUrl: string;
@@ -84,6 +88,41 @@ export const DEFAULT_RULES: RuleItem[] = [
   { title: "Deposit WO", body: "Deposit Rp100.000 per tim, dikembalikan penuh di akhir season jika tim tidak pernah WO sekalipun." },
 ];
 
+// icon = key di FACILITY_ICONS (src/lib/facility-icons.ts). label = teks tampil.
+export const DEFAULT_FACILITIES: FacilityItem[] = [
+  { icon: "cafe", label: "Cafe & Resto" },
+  { icon: "hotShower", label: "Hot Shower" },
+  { icon: "snacks", label: "Jual Makanan Ringan" },
+  { icon: "drinks", label: "Jual Minuman" },
+  { icon: "musholla", label: "Musholla" },
+  { icon: "parkirMobil", label: "Parkir Mobil" },
+  { icon: "parkirMotor", label: "Parkir Motor" },
+  { icon: "ruangGanti", label: "Ruang Ganti" },
+  { icon: "shower", label: "Shower" },
+  { icon: "toilet", label: "Toilet" },
+  { icon: "tribun", label: "Tribun Penonton" },
+  { icon: "wifi", label: "Wi-fi" },
+];
+
+// Galeri default = foto bawaan di /public. Owner ganti via /admin/settings.
+export const DEFAULT_GALLERY: GalleryItem[] = [
+  {
+    src: "/img3.jpg",
+    tag: "Venue",
+    caption: "Lapangan indoor yang nyaman buat main maupun nongkrong.",
+  },
+  {
+    src: "/img2.jpg",
+    tag: "Turnamen",
+    caption: "Event & turnamen rutin — dari mabar santai sampai liga resmi.",
+  },
+  {
+    src: "/img4.jpg",
+    tag: "Komunitas",
+    caption: "Pemain dari berbagai level main bareng tiap minggu.",
+  },
+];
+
 export const DEFAULTS: Settings = {
   name: "One Padel Club",
   tagline: "One Court, One Community, One Game",
@@ -102,14 +141,16 @@ export const DEFAULTS: Settings = {
   qrisUrl: "",
   paymentNotes: "",
   heroBadge: "Sudah Buka",
-  heroHeadline: "Lapangan padel indoor terbaik di Garut.",
+  heroHeadline: "Empat lapangan padel indoor di pusat Garut.",
   heroSubcopy:
-    "Empat lapangan indoor aesthetic, komunitas yang hidup, dan turnamen rutin. Booking lapangan, open play, coaching, sampai membership — semua dari satu tempat, tanpa ribet.",
+    "Lapangan indoor, komunitas aktif, dan turnamen rutin. Booking lapangan, open play, coaching, sampai membership — semua dari satu tempat, tanpa ribet.",
   ligaHeadline: "Kompetisi. Komunitas. Kemenangan.",
   ligaBody:
-    "Liga Padel Kota Intan: kompetisi berjenjang dengan klasemen real-time, jadwal, live score, dan profil tim. Buktikan timmu, naik kasta, jadi legenda.",
+    "Liga Padel Kota Intan: kompetisi berjenjang dengan klasemen real-time, jadwal, live score, dan profil tim. Buktikan timmu dan naik kasta tiap season.",
   schemes: DEFAULT_SCHEMES,
   rules: DEFAULT_RULES,
+  facilities: DEFAULT_FACILITIES,
+  gallery: DEFAULT_GALLERY,
   logoUrl: "",
   heroImageUrl: "",
   brandPrimary: "#1a4d33",
@@ -164,6 +205,8 @@ export function mergeSettings(v: Venue | null): Settings {
     ligaBody: str(v.ligaBody, DEFAULTS.ligaBody),
     schemes: arr(v.schemes, DEFAULTS.schemes),
     rules: arr(v.rules, DEFAULTS.rules),
+    facilities: arr(v.facilities, DEFAULTS.facilities),
+    gallery: arr(v.gallery, DEFAULTS.gallery),
     logoUrl: str(v.logoUrl, DEFAULTS.logoUrl),
     heroImageUrl: str(v.heroImageUrl, DEFAULTS.heroImageUrl),
     brandPrimary: str(v.brandPrimary, DEFAULTS.brandPrimary),

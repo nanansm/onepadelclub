@@ -58,6 +58,7 @@ export default async function SewaPage() {
               id: c.id,
               name: c.name,
               type: c.type,
+              surface: c.surface,
               pricePerHour: c.pricePerHour,
             }))}
             today={todayJakarta()}

@@ -85,6 +85,20 @@
       "when": 1781672715056,
       "tag": "0011_wooden_scalphunter",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1781701572570,
+      "tag": "0012_whole_vengeance",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1781703123963,
+      "tag": "0013_youthful_purple_man",
+      "breakpoints": true
     }
   ]
 }
