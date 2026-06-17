@@ -1,6 +1,7 @@
 import { StatusBadge } from "@/components/status-badge";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { getUpcomingBookings } from "@/lib/booking";
+import { expireStaleBookings } from "@/lib/expire";
 import { getCourts } from "@/lib/venue";
 import { dateLabelId, rangeLabel } from "@/lib/format";
 import { rupiah } from "@/lib/utils";
@@ -11,6 +12,9 @@ import { WalkInForm } from "./walk-in-form";
 export const dynamic = "force-dynamic";
 
 export default async function AdminBookingsPage() {
+  // Rapikan PENDING basi -> CANCELLED dulu supaya daftar di bawah jujur
+  // (PENDING = beneran nunggu bayar). Tanpa cron.
+  await expireStaleBookings();
   const [rows, courts] = await Promise.all([
     getUpcomingBookings(),
     getCourts(),

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { db } from "@/db";
 import { courtBooking } from "@/db/schema";
+import { expireStaleBookings } from "@/lib/expire";
 import { getSettings } from "@/lib/settings";
 import { todayJakarta } from "@/lib/tz";
 import { rupiah } from "@/lib/utils";
@@ -75,6 +76,8 @@ const manageTiles: {
 ];
 
 export default async function AdminDashboard() {
+  // Rapikan PENDING basi dulu agar angka "perlu konfirmasi" akurat. Tanpa cron.
+  await expireStaleBookings();
   const today = todayJakarta();
 
   const [stats] = await db
