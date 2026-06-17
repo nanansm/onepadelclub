@@ -9,17 +9,26 @@ const globalForDb = globalThis as unknown as {
 };
 
 const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
+// Saat `next build` (Next "collect page data"), DATABASE_URL belum tentu ada dan
+// memang tak dibutuhkan: semua route yang sentuh DB = force-dynamic (tidak
+// diprerender). Jangan throw di fase build — cukup throw saat runtime kalau env
+// benar-benar hilang (runtime juga divalidasi fail-fast di src/lib/env.ts).
+const isBuildPhase = process.env.NEXT_PHASE === "phase-production-build";
+if (!connectionString && !isBuildPhase) {
   throw new Error("DATABASE_URL belum di-set");
 }
 
 const client =
   globalForDb.__onepadelClient ??
-  postgres(connectionString, {
-    max: 10,
-    idle_timeout: 20,
-    connect_timeout: 10,
-  });
+  postgres(
+    connectionString ??
+      "postgresql://placeholder:placeholder@127.0.0.1:5432/placeholder",
+    {
+      max: 10,
+      idle_timeout: 20,
+      connect_timeout: 10,
+    },
+  );
 
 if (process.env.NODE_ENV !== "production") {
   globalForDb.__onepadelClient = client;

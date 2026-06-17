@@ -14,6 +14,12 @@ RUN npm ci
 FROM base AS build
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Next "collect page data" mengevaluasi modul tiap route saat build. Modul DB
+# (src/db) & env (src/lib/env) fail-fast kalau env hilang. Beri nilai DUMMY
+# khusus build supaya build jalan tanpa DB nyata; runtime pakai env asli dari
+# Easypanel. Semua route DB = force-dynamic, jadi tak ada koneksi saat build.
+ENV DATABASE_URL=postgresql://placeholder:placeholder@127.0.0.1:5432/placeholder
+ENV BETTER_AUTH_SECRET=build-time-placeholder-secret
 RUN npm run build
 
 # ---- runner: serve. Keeps node_modules so `next start` + drizzle migrator
