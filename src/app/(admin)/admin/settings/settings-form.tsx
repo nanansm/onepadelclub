@@ -735,7 +735,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
               />
             </Field>
             <Field label="Nama pengirim">
-              <input value={smtpFromName} onChange={(e) => setSmtpFromName(e.target.value)} placeholder="One Padel Club" className={inputClass} />
+              <input value={smtpFromName} onChange={(e) => setSmtpFromName(e.target.value)} placeholder="Padel Club" className={inputClass} />
             </Field>
             <Field label="Email pengirim">
               <input type="email" value={smtpFromEmail} onChange={(e) => setSmtpFromEmail(e.target.value)} placeholder="kamu@gmail.com" className={inputClass} />

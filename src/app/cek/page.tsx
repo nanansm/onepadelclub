@@ -12,7 +12,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Cek Booking",
-  description: "Cek status booking, coaching, open play, dan membership kamu di One Padel Club.",
+  description: "Cek status booking, coaching, open play, dan membership kamu.",
   robots: { index: false, follow: false },
 };
 

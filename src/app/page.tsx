@@ -45,8 +45,6 @@ export default async function Home() {
     address: {
       "@type": "PostalAddress",
       streetAddress: settings.address,
-      addressLocality: "Garut",
-      addressRegion: "Jawa Barat",
       addressCountry: "ID",
     },
     telephone: settings.phone || undefined,

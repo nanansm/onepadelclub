@@ -31,7 +31,8 @@ export async function getSmtpConfig(): Promise<SmtpConfig> {
     secure: v?.smtpSecure ?? process.env.SMTP_SECURE === "true",
     user,
     pass: v?.smtpPassword || process.env.SMTP_PASSWORD || "",
-    fromName: v?.smtpFromName || process.env.SMTP_FROM_NAME || "One Padel Club",
+    fromName:
+      v?.smtpFromName || v?.name || process.env.SMTP_FROM_NAME || "Padel Club",
     fromEmail: v?.smtpFromEmail || process.env.SMTP_FROM_EMAIL || user,
     notifyEmail: v?.notifyEmail || process.env.NOTIFY_EMAIL || user,
   };
@@ -77,10 +78,10 @@ export async function sendMail(
   }
 }
 
-function shell(title: string, bodyRows: string): string {
+function shell(title: string, bodyRows: string, brand: string): string {
   return `<div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;color:#16241d">
     <div style="background:#1a4d33;color:#f4f7ef;padding:18px 20px;border-radius:14px 14px 0 0">
-      <strong style="font-size:16px">One Padel Club</strong>
+      <strong style="font-size:16px">${brand}</strong>
     </div>
     <div style="border:1px solid #e4e9e2;border-top:0;border-radius:0 0 14px 14px;padding:20px">
       <h2 style="margin:0 0 12px;font-size:18px">${title}</h2>
@@ -119,8 +120,8 @@ export async function notifyAdminNewBooking(p: BookingNotif): Promise<void> {
     : "";
   await sendMail({
     to: cfg.notifyEmail,
-    subject: `[One Padel] ${p.jenis} baru — ${p.nama}`,
-    html: shell(`${p.jenis} baru masuk`, rows) + link,
+    subject: `[${cfg.fromName}] ${p.jenis} baru — ${p.nama}`,
+    html: shell(`${p.jenis} baru masuk`, rows, cfg.fromName) + link,
   });
 }
 
@@ -145,7 +146,7 @@ export async function notifyCustomerBooking(
     to,
     subject: `Konfirmasi ${p.jenis}${p.kode ? ` — ${p.kode}` : ""}`,
     html:
-      shell("Terima kasih, booking kamu kami terima 🎾", rows) +
+      shell("Terima kasih, booking kamu kami terima 🎾", rows, cfg.fromName) +
       `<p style="margin-top:12px;font-size:13px;color:#5b6b60">Selesaikan pembayaran sesuai instruksi. Slot di-hold sementara sampai pembayaran dikonfirmasi.</p>` +
       link,
   });

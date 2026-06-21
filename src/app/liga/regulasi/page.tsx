@@ -10,7 +10,7 @@ export default async function RegulasiPage() {
     <div className="min-h-dvh bg-cream/20">
       <LigaHeader />
       <main className="mx-auto max-w-2xl px-5 py-6">
-        <PageHeading plain="Regulasi" accent="Liga" sub="Aturan main Liga Padel Kota Intan." />
+        <PageHeading plain="Regulasi" accent="Liga" sub="Aturan main Liga Padel." />
         <div className="space-y-3">
           {settings.rules.map((r) => (
             <div key={r.title} className="rounded-2xl border bg-card p-5">

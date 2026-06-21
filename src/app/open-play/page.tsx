@@ -7,7 +7,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Open Play / Mabar",
   description:
-    "Gabung sesi main bareng (mabar) sesuai level di One Padel Club Garut. Daftar per kursi, kuota terbatas.",
+    "Gabung sesi main bareng (mabar) sesuai level. Daftar per kursi, kuota terbatas.",
 };
 
 export const dynamic = "force-dynamic";

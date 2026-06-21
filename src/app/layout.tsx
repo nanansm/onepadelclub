@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope, Instrument_Serif } from "next/font/google";
 import { Toaster } from "sonner";
+import { getSettings } from "@/lib/settings";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -20,31 +21,35 @@ const instrumentSerif = Instrument_Serif({
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://onepadelclub.com";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default: "One Padel Club — Main Padel di Garut",
-    template: "%s · One Padel Club",
-  },
-  description:
-    "Booking lapangan padel, open play, coaching, dan membership di Garut. Rumah resmi Liga Padel Kota Intan.",
-  applicationName: "One Padel Club",
-  openGraph: {
-    type: "website",
-    siteName: "One Padel Club",
-    locale: "id_ID",
-    url: SITE_URL,
-    title: "One Padel Club — Main Padel di Garut",
-    description:
-      "Lapangan padel indoor aesthetic di Garut. Booking lapangan, open play, coaching, membership, dan Liga Padel Kota Intan.",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "One Padel Club — Main Padel di Garut",
-    description:
-      "Lapangan padel indoor aesthetic di Garut. Booking, open play, coaching, membership, dan liga.",
-  },
-};
+// Metadata white-label: title/deskripsi/OG ikut Settings venue.
+export async function generateMetadata(): Promise<Metadata> {
+  const s = await getSettings();
+  const ogImages = s.ogImageUrl ? [{ url: s.ogImageUrl }] : undefined;
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: s.metaTitle,
+      template: `%s · ${s.name}`,
+    },
+    description: s.metaDescription,
+    applicationName: s.name,
+    openGraph: {
+      type: "website",
+      siteName: s.name,
+      locale: "id_ID",
+      url: SITE_URL,
+      title: s.metaTitle,
+      description: s.metaDescription,
+      images: ogImages,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: s.metaTitle,
+      description: s.metaDescription,
+      images: ogImages,
+    },
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",

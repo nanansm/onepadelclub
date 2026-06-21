@@ -1,21 +1,23 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getSettings } from "@/lib/settings";
 
-export function SiteHeader({ title }: { title?: string }) {
+export async function SiteHeader({ title }: { title?: string }) {
+  const s = await getSettings();
   return (
     <header className="sticky top-0 z-10 border-b bg-card/90 backdrop-blur">
       <div className="mx-auto flex max-w-3xl items-center gap-2 px-4 py-3 sm:gap-3 sm:px-5">
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <Image
-            src="/brand/logo.jpg"
-            alt="One Padel Club"
+            src={s.logoUrl || "/brand/logo.jpg"}
+            alt={s.name}
             width={32}
             height={32}
             unoptimized
             className="h-8 w-8 rounded-full object-cover"
           />
           <span className="whitespace-nowrap font-semibold text-brand">
-            One Padel Club
+            {s.name}
           </span>
         </Link>
         {title ? (

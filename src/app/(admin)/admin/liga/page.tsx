@@ -27,7 +27,7 @@ export default function AdminLigaHub() {
     <div>
       <AdminPageHeader
         title="Liga"
-        accent="Kota Intan"
+        accent="Padel"
         sub="Kelola kompetisi liga: skor, tim, jadwal, dan season."
       />
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

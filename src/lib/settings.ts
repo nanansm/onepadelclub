@@ -139,9 +139,9 @@ export const DEFAULT_GALLERY: GalleryItem[] = [
 ];
 
 export const DEFAULTS: Settings = {
-  name: "One Padel Club",
-  tagline: "One Court, One Community, One Game",
-  address: "Jl. Karacak No.36, Kota Kulon, Kec. Garut Kota, Garut",
+  name: "Padel Club",
+  tagline: "Main padel, gabung komunitas.",
+  address: "",
   whatsapp: "",
   instagram: "",
   tiktok: "",
@@ -156,12 +156,12 @@ export const DEFAULTS: Settings = {
   qrisUrl: "",
   paymentNotes: "",
   heroBadge: "Sudah Buka",
-  heroHeadline: "Empat lapangan padel indoor di pusat Garut.",
+  heroHeadline: "Lapangan padel indoor untuk semua level.",
   heroSubcopy:
-    "Lapangan indoor, komunitas aktif, dan turnamen rutin. Booking lapangan, open play, coaching, sampai membership — semua dari satu tempat, tanpa ribet.",
+    "Lapangan nyaman, komunitas aktif, dan turnamen rutin. Booking lapangan, open play, coaching, sampai membership — semua dari satu tempat, tanpa ribet.",
   ligaHeadline: "Kompetisi. Komunitas. Kemenangan.",
   ligaBody:
-    "Liga Padel Kota Intan: kompetisi berjenjang dengan klasemen real-time, jadwal, live score, dan profil tim. Buktikan timmu dan naik kasta tiap season.",
+    "Liga komunitas: kompetisi berjenjang dengan klasemen real-time, jadwal, live score, dan profil tim. Buktikan timmu dan naik kasta tiap season.",
   schemes: DEFAULT_SCHEMES,
   rules: DEFAULT_RULES,
   facilities: DEFAULT_FACILITIES,
@@ -171,9 +171,9 @@ export const DEFAULTS: Settings = {
   brandPrimary: "#1a4d33",
   brandAccent: "#d97721",
   brandCream: "#dfe8d0",
-  metaTitle: "One Padel Club — Main Padel di Garut",
+  metaTitle: "Padel Club — Booking Lapangan Padel",
   metaDescription:
-    "Booking lapangan padel, open play, coaching, dan membership di Garut. Rumah resmi Liga Padel Kota Intan.",
+    "Booking lapangan padel, open play, coaching, dan membership. Cepat, tanpa akun.",
   ogImageUrl: "",
   minDuration: 1,
   maxDuration: 6,
@@ -184,7 +184,7 @@ export const DEFAULTS: Settings = {
   smtpPort: 587,
   smtpSecure: false,
   smtpUser: "",
-  smtpFromName: "One Padel Club",
+  smtpFromName: "Padel Club",
   smtpFromEmail: "",
   smtpPasswordSet: false,
   ligaEnabled: false,

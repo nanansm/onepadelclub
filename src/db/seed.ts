@@ -1,4 +1,4 @@
-// Seed data One Padel Club. Idempotent per-tabel (aman dijalankan berkali-kali).
+// Seed data demo Padel Club. Idempotent per-tabel (aman dijalankan berkali-kali).
 import { db } from "./index";
 import {
   coach,
@@ -23,18 +23,17 @@ async function seedVenue() {
   const [v] = await db
     .insert(venue)
     .values({
-      name: "One Padel Club",
-      slug: "one-padel-club",
-      address: "Jl. Karacak No.36, Kota Kulon, Kec. Garut Kota, Garut",
+      name: "Padel Club",
+      slug: "padel-club",
+      address: "",
       whatsapp: "6281200000000",
-      instagram: "onepadelclub.idn",
-      mapsUrl:
-        "https://www.google.com/maps?q=Jl.+Karacak+No.36,+Kota+Kulon,+Garut&output=embed",
+      instagram: "",
+      mapsUrl: "",
       openHour: 7,
       closeHour: 23,
       bankName: "BCA",
       bankNumber: "1234567890",
-      bankHolder: "One Padel Club",
+      bankHolder: "Padel Club",
       paymentNotes:
         "Transfer ke rekening di atas, lalu kirim bukti ke WhatsApp admin. Booking dikonfirmasi setelah pembayaran diverifikasi.",
     })

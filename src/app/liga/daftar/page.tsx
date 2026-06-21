@@ -16,7 +16,7 @@ export default async function DaftarTimPage() {
         <PageHeading
           plain="Daftar"
           accent="Tim"
-          sub="Daftarkan tim kamu untuk ikut Liga Padel Kota Intan."
+          sub="Daftarkan tim kamu untuk ikut Liga Padel."
         />
         <p className="mb-5 rounded-2xl border bg-card p-4 text-sm text-muted">
           Isi data tim di bawah. Setelah admin meninjau, kami akan menghubungi

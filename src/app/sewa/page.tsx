@@ -9,7 +9,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Sewa Lapangan",
   description:
-    "Booking lapangan padel indoor di One Padel Club Garut. Pilih tanggal & jam, bayar, langsung main — tanpa akun.",
+    "Booking lapangan padel indoor. Pilih tanggal & jam, bayar, langsung main — tanpa akun.",
 };
 
 export const dynamic = "force-dynamic";

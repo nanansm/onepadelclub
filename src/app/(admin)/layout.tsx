@@ -29,8 +29,8 @@ export default async function AdminLayout({
       <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col bg-brand px-4 py-5 lg:flex">
         <Link href="/admin" className="mb-6 flex items-center gap-2.5 px-1">
           <Image
-            src="/brand/logo-white.png"
-            alt="One Padel Club"
+            src={settings.logoUrl || "/brand/logo-white.png"}
+            alt={settings.name}
             width={36}
             height={36}
             unoptimized
@@ -38,7 +38,7 @@ export default async function AdminLayout({
           />
           <span className="flex flex-col leading-tight">
             <span className="text-sm font-semibold text-brand-fg">
-              One Padel Club
+              {settings.name}
             </span>
             <span className="text-[11px] font-medium uppercase tracking-wider text-brand-fg/50">
               Admin Panel
@@ -65,8 +65,8 @@ export default async function AdminLayout({
             <AdminNavMobile flags={navFlags} />
             <Link href="/admin" className="flex items-center gap-2">
               <Image
-                src="/brand/logo.jpg"
-                alt="One Padel Club"
+                src={settings.logoUrl || "/brand/logo.jpg"}
+                alt={settings.name}
                 width={30}
                 height={30}
                 unoptimized

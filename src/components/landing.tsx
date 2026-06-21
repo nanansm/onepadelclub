@@ -21,17 +21,17 @@ function SectionTag({ children }: { children: ReactNode }) {
   );
 }
 
-function Logo({ logoUrl }: { logoUrl?: string }) {
+function Logo({ logoUrl, name }: { logoUrl?: string; name: string }) {
   return (
     <Link href="/" className="opc-logo">
       <Image
         src={logoUrl || "/brand/logo.jpg"}
-        alt="One Padel Club"
+        alt={name}
         width={34}
         height={34}
         unoptimized
       />
-      One Padel Club
+      {name}
     </Link>
   );
 }
@@ -40,7 +40,7 @@ export function LandingNav({ settings }: { settings: Settings }) {
   return (
     <header className="opc-nav">
       <div className="opc-container opc-nav-inner">
-        <Logo logoUrl={settings.logoUrl} />
+        <Logo logoUrl={settings.logoUrl} name={settings.name} />
         <nav className="opc-nav-links">
           <a href="#skema">Cara Main</a>
           <a href="#lapangan">Lapangan</a>
@@ -143,7 +143,7 @@ export function SchemesSection({ settings }: { settings: Settings }) {
         <div className="opc-center-head">
           <SectionTag>Cara main</SectionTag>
           <h2 className="opc-h2">
-            Empat cara main di <em>One Padel Club.</em>
+            Empat cara main di <em>{settings.name}.</em>
           </h2>
         </div>
         <div className="opc-cards">
@@ -225,7 +225,7 @@ export function CommunitySection({ settings }: { settings: Settings }) {
             Bukan cuma lapangan — <em>ini rumah komunitas.</em>
           </h2>
           <p className="opc-body" style={{ maxWidth: 560 }}>
-            Tempat pemain padel Garut ketemu, main bareng, dan berkembang.
+            Tempat pemain padel ketemu, main bareng, dan berkembang.
             Datang sendiri pun bisa pulang bawa teman baru.
           </p>
         </div>
@@ -324,7 +324,7 @@ export function LigaSection({ settings }: { settings: Settings }) {
     <section className="opc-section">
       <div className="opc-container">
         <div className="opc-feature">
-          <SectionTag>Liga Padel Kota Intan</SectionTag>
+          <SectionTag>Liga Padel</SectionTag>
           <h2 className="opc-h2 opc-h2-big">{settings.ligaHeadline}</h2>
           <p className="opc-body">{settings.ligaBody}</p>
           <Link className="opc-btn opc-btn-primary" href="/liga">
@@ -347,7 +347,7 @@ export function LokasiSection({ settings }: { settings: Settings }) {
         <div className="opc-center-head">
           <SectionTag>Lokasi</SectionTag>
           <h2 className="opc-h2">
-            Main di <em>One Padel Club.</em>
+            Main di <em>{settings.name}.</em>
           </h2>
         </div>
         <div className="opc-lokasi">
@@ -391,7 +391,7 @@ export function LokasiSection({ settings }: { settings: Settings }) {
           {settings.mapsUrl ? (
             <div className="opc-map">
               <iframe
-                title="Lokasi One Padel Club"
+                title={`Lokasi ${settings.name}`}
                 src={settings.mapsUrl}
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
@@ -412,7 +412,7 @@ export function LandingFooter({ settings }: { settings: Settings }) {
     <footer className="opc-footer">
       <div className="opc-container opc-footer-inner">
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          <Logo logoUrl={settings.logoUrl} />
+          <Logo logoUrl={settings.logoUrl} name={settings.name} />
           <span
             style={{
               fontFamily: "var(--font-instrument), Georgia, serif",
@@ -443,7 +443,7 @@ export function LandingFooter({ settings }: { settings: Settings }) {
         <div className="opc-footer-meta">
           <div>{settings.address}</div>
           <div>{hoursLabel(settings)}</div>
-          <div>&copy; {new Date().getFullYear()} One Padel Club</div>
+          <div>&copy; {new Date().getFullYear()} {settings.name}</div>
         </div>
       </div>
     </footer>

@@ -130,7 +130,7 @@ export default async function AdminDashboard() {
     <div>
       <AdminPageHeader
         title="Dashboard"
-        sub="Ringkasan operasional One Padel Club hari ini."
+        sub={`Ringkasan operasional ${settings.name} hari ini.`}
       />
 
       {/* Banner setup belum lengkap */}

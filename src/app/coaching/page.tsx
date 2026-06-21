@@ -10,7 +10,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Coaching / Klinik",
   description:
-    "Latihan padel bareng pelatih berpengalaman di One Padel Club Garut. Pilih pelatih, tanggal, dan jam yang cocok.",
+    "Latihan padel bareng pelatih berpengalaman. Pilih pelatih, tanggal, dan jam yang cocok.",
 };
 
 export const dynamic = "force-dynamic";

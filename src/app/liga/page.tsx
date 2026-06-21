@@ -9,9 +9,9 @@ import {
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Liga Padel Kota Intan",
+  title: "Liga Padel",
   description:
-    "Klasemen real-time, jadwal, live score, dan profil tim Liga Padel Kota Intan di One Padel Club Garut.",
+    "Klasemen real-time, jadwal, live score, dan profil tim Liga Padel.",
 };
 
 export const dynamic = "force-dynamic";
@@ -37,7 +37,7 @@ export default async function LigaHubPage() {
       <main className="mx-auto max-w-3xl px-5 py-6">
         <PageHeading
           plain="Liga Padel"
-          accent="Kota Intan"
+          accent="Padel"
           sub={season ? `${season.name} · ${season.year}` : undefined}
         />
 

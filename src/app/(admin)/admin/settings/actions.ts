@@ -136,8 +136,8 @@ export async function updateSettingsAction(raw: unknown): Promise<ActionResult> 
   } else {
     await db.insert(venue).values({
       ...data,
-      name: data.name || "One Padel Club",
-      slug: "one-padel-club",
+      name: data.name || "Padel Club",
+      slug: "padel-club",
     });
   }
 
@@ -156,13 +156,14 @@ export async function sendTestEmailAction(): Promise<ActionResult> {
   if (!to) {
     return { ok: false, error: "Tujuan email kosong. Isi email tujuan / SMTP user." };
   }
+  const brand = cfg.fromName || "Padel Club";
   const res = await sendMail(
     {
       to,
-      subject: "Tes notifikasi One Padel Club",
+      subject: `Tes notifikasi ${brand}`,
       html: `<div style="font-family:system-ui,sans-serif;color:#16241d">
         <p>Halo,</p>
-        <p>Ini email tes dari <strong>One Padel Club</strong>. Kalau kamu menerima email ini, konfigurasi SMTP sudah berfungsi.</p>
+        <p>Ini email tes dari <strong>${brand}</strong>. Kalau kamu menerima email ini, konfigurasi SMTP sudah berfungsi.</p>
         <p style="color:#5b6b60;font-size:13px">Dikirim otomatis dari halaman Pengaturan admin.</p>
       </div>`,
     },

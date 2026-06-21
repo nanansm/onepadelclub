@@ -31,14 +31,14 @@ export default function LoginPage() {
         <div className="flex flex-col items-center text-center">
           <Image
             src="/brand/logo.jpg"
-            alt="One Padel Club"
+            alt="Logo"
             width={56}
             height={56}
             unoptimized
             className="h-14 w-14 rounded-full object-cover"
           />
           <h1 className="mt-4 text-xl font-semibold">Masuk Admin</h1>
-          <p className="mt-1 text-sm text-muted">One Padel Club</p>
+          <p className="mt-1 text-sm text-muted">Panel pengelola</p>
         </div>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
