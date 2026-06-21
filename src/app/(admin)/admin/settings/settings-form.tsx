@@ -12,7 +12,11 @@ import type {
   GalleryItem,
 } from "@/lib/settings";
 import { FACILITY_ICON_OPTIONS, facilityIcon } from "@/lib/facility-icons";
-import { updateSettingsAction, sendTestEmailAction } from "./actions";
+import {
+  updateSettingsAction,
+  sendTestEmailAction,
+  sendTestWaAction,
+} from "./actions";
 
 const inputClass =
   "w-full rounded-lg border bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20";
@@ -122,6 +126,21 @@ export function SettingsForm({ settings }: { settings: Settings }) {
   // write-only: jangan pernah prefill nilai password
   const [smtpPassword, setSmtpPassword] = useState("");
   const [testing, setTesting] = useState(false);
+
+  // Modul & produk (v2)
+  const [ligaEnabled, setLigaEnabled] = useState(settings.ligaEnabled);
+  const [posEnabled, setPosEnabled] = useState(settings.posEnabled);
+  const [taxPercent, setTaxPercent] = useState(String(settings.taxPercent));
+  const [paymentMode, setPaymentMode] = useState(settings.paymentMode);
+  // WhatsApp Evolution API (apiKey write-only)
+  const [waEnabled, setWaEnabled] = useState(settings.waEnabled);
+  const [evoBaseUrl, setEvoBaseUrl] = useState(settings.evoBaseUrl);
+  const [evoInstance, setEvoInstance] = useState(settings.evoInstance);
+  const [evoApiKey, setEvoApiKey] = useState("");
+  // Payment gateway scaffold (serverKey write-only)
+  const [gatewayProvider, setGatewayProvider] = useState(settings.gatewayProvider);
+  const [gatewayClientKey, setGatewayClientKey] = useState(settings.gatewayClientKey);
+  const [gatewayServerKey, setGatewayServerKey] = useState("");
 
   // --- Helper editor baris {title, body} ---
   function updateItem(
@@ -359,12 +378,27 @@ export function SettingsForm({ settings }: { settings: Settings }) {
       smtpFromEmail,
       // hanya kirim password kalau diketik (kosong = pertahankan yang lama)
       ...(smtpPassword ? { smtpPassword } : {}),
+      // modul & produk (v2)
+      ligaEnabled,
+      posEnabled,
+      taxPercent: Number(taxPercent),
+      paymentMode,
+      waEnabled,
+      evoBaseUrl,
+      evoInstance,
+      gatewayProvider,
+      gatewayClientKey,
+      // secret write-only: kirim hanya kalau diketik
+      ...(evoApiKey ? { evoApiKey } : {}),
+      ...(gatewayServerKey ? { gatewayServerKey } : {}),
     };
     startTransition(async () => {
       const r = await updateSettingsAction(obj);
       if (r.ok) {
         toast.success("Tersimpan");
         setSmtpPassword(""); // jangan tahan nilai di state setelah simpan
+        setEvoApiKey("");
+        setGatewayServerKey("");
       } else toast.error(r.error ?? "Gagal");
       router.refresh();
     });
@@ -378,6 +412,18 @@ export function SettingsForm({ settings }: { settings: Settings }) {
       else toast.error(r.error ?? "Gagal kirim email tes");
     } finally {
       setTesting(false);
+    }
+  }
+
+  const [testingWa, setTestingWa] = useState(false);
+  async function sendTestWa() {
+    setTestingWa(true);
+    try {
+      const r = await sendTestWaAction();
+      if (r.ok) toast.success("WA tes terkirim ke nomor klub");
+      else toast.error(r.error ?? "Gagal kirim WA tes");
+    } finally {
+      setTestingWa(false);
     }
   }
 
@@ -417,6 +463,63 @@ export function SettingsForm({ settings }: { settings: Settings }) {
               <textarea value={mapsUrl} onChange={(e) => setMapsUrl(e.target.value)} rows={2} className={inputClass} />
             </Field>
           </div>
+        </div>
+      </Section>
+
+      {/* Modul & Pembayaran */}
+      <Section title="Modul & Pembayaran">
+        <div className="space-y-4">
+          <label className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              checked={ligaEnabled}
+              onChange={(e) => setLigaEnabled(e.target.checked)}
+              className="size-4 rounded border accent-brand"
+            />
+            <span className={labelClass}>
+              Aktifkan modul <strong>Liga</strong> (klasemen, jadwal, live score). Matikan kalau klub tak punya liga.
+            </span>
+          </label>
+          <label className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              checked={posEnabled}
+              onChange={(e) => setPosEnabled(e.target.checked)}
+              className="size-4 rounded border accent-brand"
+            />
+            <span className={labelClass}>
+              Aktifkan modul <strong>POS Kasir</strong> (jual F&B / pro-shop, stok, struk).
+            </span>
+          </label>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:max-w-lg">
+            <Field label="Mode pembayaran booking">
+              <select
+                value={paymentMode}
+                onChange={(e) =>
+                  setPaymentMode(e.target.value as Settings["paymentMode"])
+                }
+                className={inputClass}
+              >
+                <option value="MANUAL">Transfer manual + bukti WA</option>
+                <option value="GATEWAY">Payment gateway (online)</option>
+                <option value="BOTH">Keduanya (pelanggan pilih)</option>
+              </select>
+            </Field>
+            <Field label="Pajak POS (%) — PB1/PPN, 0 = tanpa pajak">
+              <input
+                type="number"
+                min={0}
+                max={100}
+                value={taxPercent}
+                onChange={(e) => setTaxPercent(e.target.value)}
+                className={inputClass}
+              />
+            </Field>
+          </div>
+          <p className="text-xs text-muted">
+            Gateway online butuh API key diisi di bagian Integrasi di bawah. Selama key kosong, pakai transfer manual.
+          </p>
         </div>
       </Section>
 
@@ -656,6 +759,107 @@ export function SettingsForm({ settings }: { settings: Settings }) {
               Simpan dulu sebelum tes — email tes pakai konfigurasi yang tersimpan.
             </span>
           </div>
+        </div>
+      </Section>
+
+      {/* Integrasi WhatsApp (Evolution API) */}
+      <Section title="Notifikasi WhatsApp (Evolution API)">
+        <div className="space-y-4">
+          <label className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              checked={waEnabled}
+              onChange={(e) => setWaEnabled(e.target.checked)}
+              className="size-4 rounded border accent-brand"
+            />
+            <span className={labelClass}>Aktifkan notifikasi WhatsApp otomatis</span>
+          </label>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <Field label="Base URL Evolution">
+                <input
+                  value={evoBaseUrl}
+                  onChange={(e) => setEvoBaseUrl(e.target.value)}
+                  placeholder="https://evolution.domainmu.com"
+                  className={inputClass}
+                />
+              </Field>
+            </div>
+            <Field label="Nama instance">
+              <input
+                value={evoInstance}
+                onChange={(e) => setEvoInstance(e.target.value)}
+                placeholder="padel-mote"
+                className={inputClass}
+              />
+            </Field>
+            <Field label="API Key">
+              <input
+                type="password"
+                value={evoApiKey}
+                onChange={(e) => setEvoApiKey(e.target.value)}
+                placeholder={settings.evoApiKeySet ? "•••••• (tersimpan, kosongkan jika tak diubah)" : "API key Evolution"}
+                autoComplete="new-password"
+                className={inputClass}
+              />
+            </Field>
+          </div>
+          <p className="text-xs text-muted">
+            Pakai instance Evolution API milikmu (self-hosted). Notif terkirim ke nomor WA pelanggan saat booking dibuat & dikonfirmasi.
+          </p>
+          <div className="flex flex-wrap items-center gap-3 border-t pt-4">
+            <button
+              type="button"
+              onClick={sendTestWa}
+              disabled={testingWa}
+              className="rounded-lg border px-4 py-2 text-sm font-medium hover:bg-cream/40 disabled:opacity-50"
+            >
+              {testingWa ? "Mengirim..." : "Kirim WA tes"}
+            </button>
+            <span className="text-xs text-muted">
+              Simpan dulu — WA tes dikirim ke nomor WhatsApp klub pakai konfigurasi tersimpan.
+            </span>
+          </div>
+        </div>
+      </Section>
+
+      {/* Payment Gateway (scaffold) */}
+      <Section title="Payment Gateway (opsional)">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Field label="Provider">
+            <select
+              value={gatewayProvider}
+              onChange={(e) => setGatewayProvider(e.target.value)}
+              className={inputClass}
+            >
+              <option value="">— Tidak aktif —</option>
+              <option value="midtrans">Midtrans</option>
+              <option value="xendit">Xendit</option>
+            </select>
+          </Field>
+          <Field label="Client Key">
+            <input
+              value={gatewayClientKey}
+              onChange={(e) => setGatewayClientKey(e.target.value)}
+              placeholder="client key (publik)"
+              className={inputClass}
+            />
+          </Field>
+          <div className="sm:col-span-2">
+            <Field label="Server Key">
+              <input
+                type="password"
+                value={gatewayServerKey}
+                onChange={(e) => setGatewayServerKey(e.target.value)}
+                placeholder={settings.gatewayServerKeySet ? "•••••• (tersimpan, kosongkan jika tak diubah)" : "server key (rahasia)"}
+                autoComplete="new-password"
+                className={inputClass}
+              />
+            </Field>
+          </div>
+          <p className="text-xs text-muted sm:col-span-2">
+            Scaffold — diisi nanti saat mau aktifkan pembayaran online. Belum memproses transaksi sampai integrasi penuh.
+          </p>
         </div>
       </Section>
 

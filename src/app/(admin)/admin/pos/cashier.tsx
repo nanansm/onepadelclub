@@ -1,0 +1,389 @@
+"use client";
+
+import { useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Plus, Minus, Trash2, ScanLine, X } from "lucide-react";
+import { rupiah } from "@/lib/utils";
+import { createSaleAction } from "./actions";
+
+type ProductLite = {
+  id: string;
+  name: string;
+  category: "FNB" | "RETAIL" | "RENTAL" | "SERVICE";
+  price: number;
+  barcode: string | null;
+  trackStock: boolean;
+  stock: number;
+};
+
+type CartItem = { product: ProductLite; qty: number };
+
+type Pay = "CASH" | "QRIS" | "TRANSFER";
+
+const CATEGORY_LABEL: Record<ProductLite["category"], string> = {
+  FNB: "F&B",
+  RETAIL: "Pro-shop",
+  RENTAL: "Sewa Alat",
+  SERVICE: "Jasa",
+};
+
+const PAY_LABEL: Record<Pay, string> = {
+  CASH: "Tunai",
+  QRIS: "QRIS",
+  TRANSFER: "Transfer",
+};
+
+const inputClass =
+  "w-full rounded-lg border bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20";
+
+export function Cashier({
+  products,
+  taxPercent,
+}: {
+  products: ProductLite[];
+  taxPercent: number;
+}) {
+  const router = useRouter();
+  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cat, setCat] = useState<"ALL" | ProductLite["category"]>("ALL");
+  const [query, setQuery] = useState("");
+  const [discount, setDiscount] = useState("");
+  const [pay, setPay] = useState<Pay>("CASH");
+  const [customerName, setCustomerName] = useState("");
+  const [busy, setBusy] = useState(false);
+  const scanRef = useRef<HTMLInputElement>(null);
+
+  // Kategori yang benar-benar ada produknya.
+  const cats = useMemo(() => {
+    const set = new Set(products.map((p) => p.category));
+    return (["FNB", "RETAIL", "RENTAL", "SERVICE"] as const).filter((c) =>
+      set.has(c),
+    );
+  }, [products]);
+
+  const visible = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return products.filter(
+      (p) =>
+        (cat === "ALL" || p.category === cat) &&
+        (!q ||
+          p.name.toLowerCase().includes(q) ||
+          (p.barcode ?? "").toLowerCase().includes(q)),
+    );
+  }, [products, cat, query]);
+
+  function stockLeft(p: ProductLite) {
+    if (!p.trackStock) return Infinity;
+    const inCart = cart.find((c) => c.product.id === p.id)?.qty ?? 0;
+    return p.stock - inCart;
+  }
+
+  function add(p: ProductLite) {
+    if (stockLeft(p) <= 0) {
+      toast.error(`Stok ${p.name} habis.`);
+      return;
+    }
+    setCart((prev) => {
+      const ex = prev.find((c) => c.product.id === p.id);
+      if (ex)
+        return prev.map((c) =>
+          c.product.id === p.id ? { ...c, qty: c.qty + 1 } : c,
+        );
+      return [...prev, { product: p, qty: 1 }];
+    });
+  }
+
+  function setQty(id: string, qty: number) {
+    setCart((prev) =>
+      qty <= 0
+        ? prev.filter((c) => c.product.id !== id)
+        : prev.map((c) => (c.product.id === id ? { ...c, qty } : c)),
+    );
+  }
+
+  function onScan(e: React.FormEvent) {
+    e.preventDefault();
+    const code = query.trim();
+    if (!code) return;
+    const hit = products.find((p) => p.barcode && p.barcode === code);
+    if (hit) {
+      add(hit);
+      setQuery("");
+    } else {
+      toast.error("Barcode tak cocok produk apa pun.");
+    }
+    scanRef.current?.focus();
+  }
+
+  const subtotal = cart.reduce((s, c) => s + c.product.price * c.qty, 0);
+  const disc = Math.min(Math.max(Number(discount) || 0, 0), subtotal);
+  const tax = Math.round(((subtotal - disc) * taxPercent) / 100);
+  const total = subtotal - disc + tax;
+
+  async function checkout() {
+    if (!cart.length) return;
+    setBusy(true);
+    const res = await createSaleAction({
+      items: cart.map((c) => ({ productId: c.product.id, qty: c.qty })),
+      discount: disc,
+      paymentMethod: pay,
+      customerName,
+    });
+    setBusy(false);
+    if (!res.ok) {
+      toast.error(res.error ?? "Gagal");
+      return;
+    }
+    toast.success(`Transaksi ${res.code} berhasil · ${rupiah(res.total ?? total)}`);
+    setCart([]);
+    setDiscount("");
+    setCustomerName("");
+    setPay("CASH");
+    router.refresh();
+  }
+
+  return (
+    <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
+      {/* Katalog */}
+      <div className="space-y-3">
+        <form onSubmit={onScan} className="relative">
+          <ScanLine className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" />
+          <input
+            ref={scanRef}
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Cari produk atau scan barcode…"
+            className={`${inputClass} pl-9`}
+            autoComplete="off"
+          />
+        </form>
+
+        {/* Tab kategori */}
+        <div className="flex flex-wrap gap-2">
+          <CatChip active={cat === "ALL"} onClick={() => setCat("ALL")}>
+            Semua
+          </CatChip>
+          {cats.map((c) => (
+            <CatChip key={c} active={cat === c} onClick={() => setCat(c)}>
+              {CATEGORY_LABEL[c]}
+            </CatChip>
+          ))}
+        </div>
+
+        {/* Grid produk — tombol besar (touch) */}
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
+          {visible.map((p) => {
+            const left = stockLeft(p);
+            const out = left <= 0;
+            return (
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => add(p)}
+                disabled={out}
+                className="flex min-h-[84px] flex-col justify-between rounded-xl border bg-card p-3 text-left transition active:scale-95 hover:border-brand/40 disabled:opacity-40"
+              >
+                <span className="line-clamp-2 text-sm font-medium leading-tight">
+                  {p.name}
+                </span>
+                <span className="mt-1 flex items-center justify-between">
+                  <span className="text-sm font-semibold text-brand">
+                    {rupiah(p.price)}
+                  </span>
+                  {p.trackStock ? (
+                    <span className="text-[11px] text-muted">
+                      {out ? "habis" : `${left}`}
+                    </span>
+                  ) : null}
+                </span>
+              </button>
+            );
+          })}
+          {visible.length === 0 ? (
+            <p className="col-span-full py-8 text-center text-sm text-muted">
+              Tak ada produk cocok.
+            </p>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Keranjang */}
+      <div className="lg:sticky lg:top-4 lg:h-fit">
+        <div className="rounded-2xl border bg-card p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="font-semibold">Keranjang</h2>
+            {cart.length > 0 ? (
+              <button
+                type="button"
+                onClick={() => setCart([])}
+                className="inline-flex items-center gap-1 text-xs text-muted hover:text-red-600"
+              >
+                <X className="size-3.5" /> Kosongkan
+              </button>
+            ) : null}
+          </div>
+
+          {cart.length === 0 ? (
+            <p className="py-6 text-center text-sm text-muted">
+              Tap produk untuk menambah.
+            </p>
+          ) : (
+            <ul className="space-y-2">
+              {cart.map((c) => (
+                <li
+                  key={c.product.id}
+                  className="flex items-center gap-2 rounded-lg border bg-white p-2"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium">
+                      {c.product.name}
+                    </p>
+                    <p className="text-xs text-muted">
+                      {rupiah(c.product.price)} × {c.qty} ={" "}
+                      {rupiah(c.product.price * c.qty)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <IconBtn onClick={() => setQty(c.product.id, c.qty - 1)}>
+                      <Minus className="size-4" />
+                    </IconBtn>
+                    <span className="w-6 text-center text-sm font-semibold">
+                      {c.qty}
+                    </span>
+                    <IconBtn
+                      onClick={() => add(c.product)}
+                      disabled={stockLeft(c.product) <= 0}
+                    >
+                      <Plus className="size-4" />
+                    </IconBtn>
+                    <IconBtn onClick={() => setQty(c.product.id, 0)}>
+                      <Trash2 className="size-4 text-red-600" />
+                    </IconBtn>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* Diskon + pelanggan */}
+          <div className="mt-3 space-y-2">
+            <label className="block">
+              <span className="text-xs font-medium text-muted">Diskon (Rp)</span>
+              <input
+                type="number"
+                min={0}
+                value={discount}
+                onChange={(e) => setDiscount(e.target.value)}
+                placeholder="0"
+                className={inputClass}
+              />
+            </label>
+            <label className="block">
+              <span className="text-xs font-medium text-muted">
+                Nama pelanggan (opsional)
+              </span>
+              <input
+                value={customerName}
+                onChange={(e) => setCustomerName(e.target.value)}
+                className={inputClass}
+              />
+            </label>
+          </div>
+
+          {/* Metode bayar */}
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            {(["CASH", "QRIS", "TRANSFER"] as Pay[]).map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => setPay(m)}
+                className={`rounded-lg border px-2 py-2 text-sm font-medium transition ${
+                  pay === m
+                    ? "border-brand bg-brand/10 text-brand"
+                    : "hover:bg-cream/40"
+                }`}
+              >
+                {PAY_LABEL[m]}
+              </button>
+            ))}
+          </div>
+
+          {/* Total */}
+          <div className="mt-3 space-y-1 border-t pt-3 text-sm">
+            <Row label="Subtotal" value={rupiah(subtotal)} />
+            {disc > 0 ? <Row label="Diskon" value={`- ${rupiah(disc)}`} /> : null}
+            {taxPercent > 0 ? (
+              <Row label={`Pajak ${taxPercent}%`} value={rupiah(tax)} />
+            ) : null}
+            <div className="flex items-center justify-between pt-1 text-base font-bold">
+              <span>Total</span>
+              <span className="text-brand">{rupiah(total)}</span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={checkout}
+            disabled={busy || cart.length === 0}
+            className="mt-3 w-full rounded-lg bg-brand px-4 py-3 font-semibold text-brand-fg transition active:scale-[0.99] disabled:opacity-50"
+          >
+            {busy ? "Memproses…" : `Bayar ${rupiah(total)}`}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CatChip({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-full border px-3 py-1.5 text-sm font-medium transition ${
+        active ? "border-brand bg-brand text-brand-fg" : "hover:bg-cream/40"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function IconBtn({
+  onClick,
+  disabled,
+  children,
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className="flex size-8 items-center justify-center rounded-lg border bg-white transition active:scale-90 hover:bg-cream/40 disabled:opacity-40"
+    >
+      {children}
+    </button>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between text-muted">
+      <span>{label}</span>
+      <span className="font-medium text-foreground">{value}</span>
+    </div>
+  );
+}

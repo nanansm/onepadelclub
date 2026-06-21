@@ -75,7 +75,7 @@ export default async function Home() {
       <StepsSection />
       {courts.length > 0 ? <CourtsSection courts={courts} /> : null}
       <FacilitiesSection settings={settings} />
-      <LigaSection settings={settings} />
+      {settings.ligaEnabled ? <LigaSection settings={settings} /> : null}
       <LokasiSection settings={settings} />
       <LandingFooter settings={settings} />
     </div>

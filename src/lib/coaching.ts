@@ -11,6 +11,7 @@ import { genCode, isUniqueViolation } from "./code";
 import { getSettings } from "./settings";
 import { getActiveMembershipByWa, applyMemberDiscount } from "./lookup";
 import { fireNotify, notifyAdminNewBooking, notifyCustomerBooking } from "./mailer";
+import { fireWa, notifyCustomerBookingWa } from "./wa";
 import { rupiah } from "./utils";
 import { rangeLabel } from "./format";
 
@@ -189,6 +190,17 @@ export async function createCoachingBooking(
       notifyCustomerBooking(input.customerEmail, {
         jenis: "Coaching",
         kode: code,
+        detail,
+        total: rupiah(totalPrice),
+        invoicePath: `/coaching/${code}`,
+      }),
+    );
+    fireWa(() =>
+      notifyCustomerBookingWa({
+        jenis: "Coaching",
+        kode: code,
+        nama: input.customerName,
+        wa: input.customerWa,
         detail,
         total: rupiah(totalPrice),
         invoicePath: `/coaching/${code}`,

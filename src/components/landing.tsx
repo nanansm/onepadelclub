@@ -46,7 +46,7 @@ export function LandingNav({ settings }: { settings: Settings }) {
           <a href="#lapangan">Lapangan</a>
           <a href="#fasilitas">Fasilitas</a>
           <a href="#lokasi">Lokasi</a>
-          <Link href="/liga">Liga</Link>
+          {settings.ligaEnabled ? <Link href="/liga">Liga</Link> : null}
         </nav>
         <div className="opc-nav-actions">
           <Link className="opc-btn opc-btn-primary opc-btn-sm" href="/sewa">
@@ -84,9 +84,11 @@ export function Hero({
             <Link className="opc-btn opc-btn-primary" href="/sewa">
               Booking Lapangan
             </Link>
-            <Link className="opc-btn opc-btn-ghost" href="/liga">
-              Lihat Liga
-            </Link>
+            {settings.ligaEnabled ? (
+              <Link className="opc-btn opc-btn-ghost" href="/liga">
+                Lihat Liga
+              </Link>
+            ) : null}
           </div>
           <div className="opc-hero-stats">
             <div className="opc-stat">
@@ -427,9 +429,11 @@ export function LandingFooter({ settings }: { settings: Settings }) {
           <a href="#lapangan">Lapangan</a>
           <a href="#fasilitas">Fasilitas</a>
           <a href="#lokasi">Lokasi</a>
-          <Link href="/liga">Liga</Link>
+          {settings.ligaEnabled ? <Link href="/liga">Liga</Link> : null}
           <Link href="/cek">Cek Booking</Link>
-          <Link href="/liga/daftar">Daftar Liga</Link>
+          {settings.ligaEnabled ? (
+            <Link href="/liga/daftar">Daftar Liga</Link>
+          ) : null}
           {igUrl ? (
             <a href={igUrl} target="_blank" rel="noopener noreferrer">
               Instagram

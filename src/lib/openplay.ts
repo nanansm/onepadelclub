@@ -10,6 +10,7 @@ import { todayJakarta } from "./tz";
 import { normalizeWa } from "./booking";
 import { genCode, isUniqueViolation } from "./code";
 import { fireNotify, notifyAdminNewBooking, notifyCustomerBooking } from "./mailer";
+import { fireWa, notifyCustomerBookingWa } from "./wa";
 import { hourLabel } from "./format";
 
 const ACTIVE_REG = ["PENDING", "PAID"] as const;
@@ -148,6 +149,16 @@ export async function registerOpenPlay(
       notifyCustomerBooking(input.customerEmail, {
         jenis: "Open Play",
         kode: code,
+        detail,
+        invoicePath: `/open-play/${code}`,
+      }),
+    );
+    fireWa(() =>
+      notifyCustomerBookingWa({
+        jenis: "Open Play",
+        kode: code,
+        nama: input.customerName,
+        wa: input.customerWa,
         detail,
         invoicePath: `/open-play/${code}`,
       }),

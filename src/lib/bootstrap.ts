@@ -12,11 +12,18 @@ import { auth } from "@/lib/auth";
 async function ensureVenue(): Promise<string> {
   const existing = await db.select({ id: venue.id }).from(venue).limit(1);
   if (existing.length > 0) return existing[0].id;
+  // White-label: nama/slug klien dari env (Easypanel), bukan hardcode.
+  // Owner ubah nama lagi nanti via /admin/settings. Default netral.
+  const name = process.env.VENUE_NAME?.trim() || "Padel Club";
+  const slug =
+    process.env.VENUE_SLUG?.trim().toLowerCase() ||
+    name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") ||
+    "padel-club";
   const [v] = await db
     .insert(venue)
-    .values({ name: "One Padel Club", slug: "one-padel-club" })
+    .values({ name, slug })
     .returning({ id: venue.id });
-  console.log("[bootstrap] baris venue dibuat.");
+  console.log(`[bootstrap] baris venue dibuat: ${name} (${slug}).`);
   return v.id;
 }
 

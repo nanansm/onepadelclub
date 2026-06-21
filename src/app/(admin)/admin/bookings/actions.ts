@@ -3,10 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
-import { courtBooking } from "@/db/schema";
+import { courtBooking, court } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
 import { logAudit } from "@/lib/audit";
 import { getVenue } from "@/lib/venue";
+import { fireWa, notifyCustomerPaidWa } from "@/lib/wa";
+import { rangeLabel } from "@/lib/format";
+import { rupiah } from "@/lib/utils";
 import { getDayAvailability, type HourSlot } from "@/lib/availability";
 import {
   createWalkInBooking,
@@ -48,11 +51,43 @@ export async function confirmBookingAction(id: string): Promise<ActionResult> {
     .update(courtBooking)
     .set({ status: "PAID" })
     .where(and(eq(courtBooking.id, id), eq(courtBooking.status, "PENDING")))
-    .returning({ id: courtBooking.id });
+    .returning({
+      code: courtBooking.code,
+      nama: courtBooking.customerName,
+      wa: courtBooking.customerWa,
+      courtId: courtBooking.courtId,
+      date: courtBooking.date,
+      startHour: courtBooking.startHour,
+      duration: courtBooking.duration,
+      totalPrice: courtBooking.totalPrice,
+    });
   if (updated.length === 0) {
     return { ok: false, error: "Booking tidak bisa dikonfirmasi." };
   }
   await logAudit("confirm_payment", "court_booking", id);
+
+  // Beri tahu customer via WA bahwa pembayaran terkonfirmasi (fire-and-forget).
+  const b = updated[0];
+  const c = (
+    await db
+      .select({ name: court.name })
+      .from(court)
+      .where(eq(court.id, b.courtId))
+      .limit(1)
+  )[0];
+  const detail = `${c?.name ?? "Lapangan"} · ${b.date} · ${rangeLabel(b.startHour, b.duration)}`;
+  fireWa(() =>
+    notifyCustomerPaidWa({
+      jenis: "Sewa Lapangan",
+      kode: b.code,
+      nama: b.nama,
+      wa: b.wa,
+      detail,
+      total: rupiah(b.totalPrice),
+      invoicePath: `/booking/${b.code}`,
+    }),
+  );
+
   revalidatePath("/admin/bookings");
   return { ok: true };
 }

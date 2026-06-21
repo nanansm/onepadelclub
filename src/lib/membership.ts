@@ -5,6 +5,7 @@ import { membership, membershipPlan } from "@/db/schema";
 import { normalizeWa } from "./booking";
 import { genCode, isUniqueViolation } from "./code";
 import { fireNotify, notifyAdminNewBooking, notifyCustomerBooking } from "./mailer";
+import { fireWa, notifyCustomerBookingWa } from "./wa";
 import { rupiah } from "./utils";
 
 export async function getActivePlans() {
@@ -85,6 +86,16 @@ export async function joinMembership(
       notifyCustomerBooking(input.customerEmail, {
         jenis: "Membership",
         kode: code,
+        detail,
+        invoicePath: `/membership/${code}`,
+      }),
+    );
+    fireWa(() =>
+      notifyCustomerBookingWa({
+        jenis: "Membership",
+        kode: code,
+        nama: input.customerName,
+        wa: input.customerWa,
         detail,
         invoicePath: `/membership/${code}`,
       }),

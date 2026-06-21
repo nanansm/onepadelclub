@@ -18,6 +18,10 @@ export default async function AdminLayout({
 }) {
   const session = await requireAdmin();
   const settings = await getSettings();
+  const navFlags = {
+    ligaEnabled: settings.ligaEnabled,
+    posEnabled: settings.posEnabled,
+  };
 
   return (
     <div className="min-h-dvh bg-cream/20 lg:flex" style={brandVars(settings)}>
@@ -42,7 +46,7 @@ export default async function AdminLayout({
           </span>
         </Link>
 
-        <AdminNavSidebar />
+        <AdminNavSidebar flags={navFlags} />
 
         <div className="mt-4 border-t border-brand-fg/15 pt-4">
           <p className="truncate px-1 text-xs text-brand-fg/60">
@@ -58,7 +62,7 @@ export default async function AdminLayout({
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-20 border-b bg-card/95 backdrop-blur lg:hidden">
           <div className="flex items-center gap-2.5 px-4 py-3">
-            <AdminNavMobile />
+            <AdminNavMobile flags={navFlags} />
             <Link href="/admin" className="flex items-center gap-2">
               <Image
                 src="/brand/logo.jpg"

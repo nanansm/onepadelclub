@@ -5,7 +5,9 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { ADMIN_NAV } from "./nav-items";
+import { visibleNav } from "./nav-items";
+
+export type NavFlags = { ligaEnabled: boolean; posEnabled: boolean };
 
 function isActive(pathname: string, href: string) {
   if (href === "/admin") return pathname === "/admin";
@@ -13,11 +15,11 @@ function isActive(pathname: string, href: string) {
 }
 
 /** Sidebar nav (desktop) — daftar vertikal di atas background hijau brand. */
-export function AdminNavSidebar() {
+export function AdminNavSidebar({ flags }: { flags: NavFlags }) {
   const pathname = usePathname();
   return (
     <nav className="flex flex-1 flex-col gap-1">
-      {ADMIN_NAV.map(({ label, href, icon: Icon }) => {
+      {visibleNav(flags).map(({ label, href, icon: Icon }) => {
         const active = isActive(pathname, href);
         return (
           <Link
@@ -47,7 +49,7 @@ export function AdminNavSidebar() {
 }
 
 /** Mobile nav — burger button yang buka panel dropdown vertikal. */
-export function AdminNavMobile() {
+export function AdminNavMobile({ flags }: { flags: NavFlags }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
@@ -84,7 +86,7 @@ export function AdminNavMobile() {
           />
           {/* Panel */}
           <nav className="absolute left-0 top-full z-40 mt-2 max-h-[72vh] w-64 origin-top-left overflow-y-auto rounded-2xl border border-border bg-card p-2 shadow-xl ring-1 ring-black/5 motion-safe:animate-in motion-safe:fade-in motion-safe:zoom-in-95 motion-safe:duration-150">
-            {ADMIN_NAV.map(({ label, href, icon: Icon }) => {
+            {visibleNav(flags).map(({ label, href, icon: Icon }) => {
               const active = isActive(pathname, href);
               return (
                 <Link

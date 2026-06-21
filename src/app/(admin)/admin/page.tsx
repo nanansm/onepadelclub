@@ -10,6 +10,7 @@ import {
   GraduationCap,
   BadgeCheck,
   Trophy,
+  ShoppingCart,
   Settings,
   AlertTriangle,
   type LucideIcon,
@@ -30,6 +31,7 @@ const manageTiles: {
   href: string;
   desc: string;
   icon: LucideIcon;
+  module?: "liga" | "pos";
 }[] = [
   {
     label: "Booking Lapangan",
@@ -62,10 +64,18 @@ const manageTiles: {
     icon: BadgeCheck,
   },
   {
-    label: "Liga Kota Intan",
+    label: "POS Kasir",
+    href: "/admin/pos",
+    desc: "Jual F&B / pro-shop, stok, struk",
+    icon: ShoppingCart,
+    module: "pos",
+  },
+  {
+    label: "Liga",
     href: "/admin/liga",
     desc: "Skor, tim, jadwal, season",
     icon: Trophy,
+    module: "liga",
   },
   {
     label: "Pengaturan",
@@ -179,7 +189,15 @@ export default async function AdminDashboard() {
         Kelola
       </h2>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {manageTiles.map(({ label, href, desc, icon: Icon }) => (
+        {manageTiles
+          .filter((t) =>
+            t.module === "liga"
+              ? settings.ligaEnabled
+              : t.module === "pos"
+                ? settings.posEnabled
+                : true,
+          )
+          .map(({ label, href, desc, icon: Icon }) => (
           <Link
             key={href}
             href={href}

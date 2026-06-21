@@ -7,6 +7,8 @@ import { db } from "@/db";
 import { venue } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
 import { getSmtpConfig, sendMail } from "@/lib/mailer";
+import { getWaConfig, sendWa } from "@/lib/wa";
+import { getSettings } from "@/lib/settings";
 
 type ActionResult = { ok: boolean; error?: string };
 
@@ -92,6 +94,20 @@ const settingsSchema = z.object({
   smtpFromEmail: z.string().trim().optional().default(""),
   // write-only: cuma di-set kalau diisi (kosong = pertahankan yang lama)
   smtpPassword: z.string().optional(),
+  // --- Produk white-label (v2) ---
+  ligaEnabled: coerceBool.default(false),
+  posEnabled: coerceBool.default(false),
+  taxPercent: z.coerce.number().int().min(0).max(100).default(0),
+  paymentMode: z.enum(["MANUAL", "GATEWAY", "BOTH"]).default("MANUAL"),
+  // WhatsApp Evolution API
+  waEnabled: coerceBool.default(false),
+  evoBaseUrl: z.string().trim().optional().default(""),
+  evoInstance: z.string().trim().optional().default(""),
+  evoApiKey: z.string().optional(), // write-only
+  // Payment gateway (scaffold)
+  gatewayProvider: z.string().trim().optional().default(""),
+  gatewayClientKey: z.string().trim().optional().default(""),
+  gatewayServerKey: z.string().optional(), // write-only
 });
 
 export async function updateSettingsAction(raw: unknown): Promise<ActionResult> {
@@ -100,8 +116,8 @@ export async function updateSettingsAction(raw: unknown): Promise<ActionResult> 
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Data tidak valid" };
   }
-  // Pisahkan password: hanya set kalau diisi (kosong = pertahankan yang lama).
-  const { smtpPassword, ...rest } = parsed.data;
+  // Pisahkan secret write-only: hanya set kalau diisi (kosong = pertahankan lama).
+  const { smtpPassword, evoApiKey, gatewayServerKey, ...rest } = parsed.data;
   const data = {
     ...rest,
     // Buang baris fasilitas tanpa label biar tak render chip kosong.
@@ -109,6 +125,8 @@ export async function updateSettingsAction(raw: unknown): Promise<ActionResult> 
     // Buang slide galeri tanpa gambar.
     gallery: rest.gallery.filter((g) => g.src.trim().length > 0),
     ...(smtpPassword && smtpPassword.length > 0 ? { smtpPassword } : {}),
+    ...(evoApiKey && evoApiKey.length > 0 ? { evoApiKey } : {}),
+    ...(gatewayServerKey && gatewayServerKey.length > 0 ? { gatewayServerKey } : {}),
   };
 
   // Upsert baris venue tunggal.
@@ -151,4 +169,22 @@ export async function sendTestEmailAction(): Promise<ActionResult> {
     cfg,
   );
   return res;
+}
+
+// Kirim WA tes ke nomor WhatsApp klub (venue.whatsapp) pakai config TERSIMPAN.
+export async function sendTestWaAction(): Promise<ActionResult> {
+  await requireAdmin();
+  const cfg = await getWaConfig();
+  const settings = await getSettings();
+  const to = settings.whatsapp;
+  if (!to) {
+    return { ok: false, error: "Nomor WhatsApp klub kosong. Isi di Identitas & Kontak." };
+  }
+  return sendWa(
+    {
+      to,
+      text: "✅ Tes notifikasi WhatsApp berhasil. Konfigurasi Evolution API sudah aktif.",
+    },
+    cfg,
+  );
 }

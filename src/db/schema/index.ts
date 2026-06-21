@@ -4,3 +4,4 @@ export * from "./booking";
 export * from "./activities";
 export * from "./liga";
 export * from "./audit";
+export * from "./pos";

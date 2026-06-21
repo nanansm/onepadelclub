@@ -7,6 +7,7 @@ import { MAX_DURATION, MIN_DURATION } from "./booking-constants";
 import { genCode, isUniqueViolation } from "./code";
 import { getActiveMembershipByWa, applyMemberDiscount } from "./lookup";
 import { fireNotify, notifyAdminNewBooking, notifyCustomerBooking } from "./mailer";
+import { fireWa, notifyCustomerBookingWa } from "./wa";
 import { getSettings } from "./settings";
 import { todayJakarta } from "./tz";
 import { rupiah } from "./utils";
@@ -115,6 +116,17 @@ export async function createBooking(
       notifyCustomerBooking(input.customerEmail, {
         jenis: "Sewa Lapangan",
         kode: code,
+        detail,
+        total: rupiah(totalPrice),
+        invoicePath: `/booking/${code}`,
+      }),
+    );
+    fireWa(() =>
+      notifyCustomerBookingWa({
+        jenis: "Sewa Lapangan",
+        kode: code,
+        nama: input.customerName,
+        wa: input.customerWa,
         detail,
         total: rupiah(totalPrice),
         invoicePath: `/booking/${code}`,

@@ -68,6 +68,21 @@ export type Settings = {
   smtpFromName: string;
   smtpFromEmail: string;
   smtpPasswordSet: boolean; // cuma penanda "sudah ada password", bukan nilainya
+  // --- Produk white-label (v2) ---
+  // modul toggle
+  ligaEnabled: boolean;
+  posEnabled: boolean;
+  taxPercent: number;
+  paymentMode: "MANUAL" | "GATEWAY" | "BOTH";
+  // WhatsApp Evolution API — apiKey server-only (cuma flag yang keluar)
+  waEnabled: boolean;
+  evoBaseUrl: string;
+  evoInstance: string;
+  evoApiKeySet: boolean;
+  // Payment gateway (scaffold) — serverKey server-only
+  gatewayProvider: string;
+  gatewayClientKey: string;
+  gatewayServerKeySet: boolean;
 };
 
 export const DEFAULT_SCHEMES: SchemeItem[] = [
@@ -172,6 +187,17 @@ export const DEFAULTS: Settings = {
   smtpFromName: "One Padel Club",
   smtpFromEmail: "",
   smtpPasswordSet: false,
+  ligaEnabled: false,
+  posEnabled: false,
+  taxPercent: 0,
+  paymentMode: "MANUAL",
+  waEnabled: false,
+  evoBaseUrl: "",
+  evoInstance: "",
+  evoApiKeySet: false,
+  gatewayProvider: "",
+  gatewayClientKey: "",
+  gatewayServerKeySet: false,
 };
 
 // Gabung baris venue (boleh null) dengan DEFAULTS. String kosong/null -> default.
@@ -228,6 +254,17 @@ export function mergeSettings(v: Venue | null): Settings {
     smtpFromEmail: str(v.smtpFromEmail, DEFAULTS.smtpFromEmail),
     // Hanya penanda boolean — nilai password tak pernah keluar dari server.
     smtpPasswordSet: Boolean(v.smtpPassword && v.smtpPassword.length > 0),
+    ligaEnabled: v.ligaEnabled ?? DEFAULTS.ligaEnabled,
+    posEnabled: v.posEnabled ?? DEFAULTS.posEnabled,
+    taxPercent: v.taxPercent ?? DEFAULTS.taxPercent,
+    paymentMode: (v.paymentMode as Settings["paymentMode"]) || DEFAULTS.paymentMode,
+    waEnabled: v.waEnabled ?? DEFAULTS.waEnabled,
+    evoBaseUrl: str(v.evoBaseUrl, DEFAULTS.evoBaseUrl),
+    evoInstance: str(v.evoInstance, DEFAULTS.evoInstance),
+    evoApiKeySet: Boolean(v.evoApiKey && v.evoApiKey.length > 0),
+    gatewayProvider: str(v.gatewayProvider, DEFAULTS.gatewayProvider),
+    gatewayClientKey: str(v.gatewayClientKey, DEFAULTS.gatewayClientKey),
+    gatewayServerKeySet: Boolean(v.gatewayServerKey && v.gatewayServerKey.length > 0),
   };
 }
 

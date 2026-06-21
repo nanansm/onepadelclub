@@ -84,6 +84,23 @@ export const venue = onepadel.table("venue", {
   smtpPassword: text("smtp_password"),
   smtpFromName: text("smtp_from_name"),
   smtpFromEmail: text("smtp_from_email"),
+  // --- Produk white-label (v2). Semua additive & nullable/ber-default. ---
+  // Modul toggle: sembunyikan fitur yang tak dipakai klien tertentu.
+  ligaEnabled: boolean("liga_enabled").notNull().default(false),
+  posEnabled: boolean("pos_enabled").notNull().default(false),
+  // Pajak POS (PB1/PPN), persen. 0 = tanpa pajak.
+  taxPercent: integer("tax_percent").notNull().default(0),
+  // Mode pembayaran: MANUAL (transfer+bukti WA) | GATEWAY | BOTH.
+  paymentMode: text("payment_mode").notNull().default("MANUAL"),
+  // --- Notifikasi WhatsApp via Evolution API (self-hosted). ---
+  waEnabled: boolean("wa_enabled").notNull().default(false),
+  evoBaseUrl: text("evo_base_url"),
+  evoInstance: text("evo_instance"),
+  evoApiKey: text("evo_api_key"), // server-only, tak pernah dikirim ke client
+  // --- Payment gateway (scaffold, nonaktif sampai key diisi). ---
+  gatewayProvider: text("gateway_provider"), // mis. "midtrans" | "xendit"
+  gatewayServerKey: text("gateway_server_key"), // server-only
+  gatewayClientKey: text("gateway_client_key"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
