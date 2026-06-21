@@ -30,12 +30,12 @@ export default function LoginPage() {
       <div className="w-full max-w-sm rounded-2xl border bg-card p-7 shadow-sm">
         <div className="flex flex-col items-center text-center">
           <Image
-            src="/brand/logo.jpg"
+            src="/brand/logo-mark.webp"
             alt="Logo"
-            width={56}
+            width={100}
             height={56}
             unoptimized
-            className="h-14 w-14 rounded-full object-cover"
+            className="h-14 w-auto object-contain"
           />
           <h1 className="mt-4 text-xl font-semibold">Masuk Admin</h1>
           <p className="mt-1 text-sm text-muted">Panel pengelola</p>

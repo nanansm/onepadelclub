@@ -19,12 +19,12 @@ export async function LigaHeader() {
         <div className="flex h-14 items-center gap-3">
           <Link href="/" className="flex items-center gap-2">
             <Image
-              src={s.logoUrl || "/brand/logo.jpg"}
+              src={s.logoUrl || "/brand/logo-mark.webp"}
               alt={s.name}
-              width={30}
-              height={30}
+              width={50}
+              height={28}
               unoptimized
-              className="h-7 w-7 rounded-full object-cover"
+              className="h-7 w-auto object-contain"
             />
             <span className="font-semibold text-brand">{s.name} Liga</span>
           </Link>

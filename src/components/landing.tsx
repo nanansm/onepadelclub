@@ -25,9 +25,9 @@ function Logo({ logoUrl, name }: { logoUrl?: string; name: string }) {
   return (
     <Link href="/" className="opc-logo">
       <Image
-        src={logoUrl || "/brand/logo.jpg"}
+        src={logoUrl || "/brand/logo-mark.webp"}
         alt={name}
-        width={34}
+        width={62}
         height={34}
         unoptimized
       />

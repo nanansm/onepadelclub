@@ -29,12 +29,12 @@ export default async function AdminLayout({
       <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col bg-brand px-4 py-5 lg:flex">
         <Link href="/admin" className="mb-6 flex items-center gap-2.5 px-1">
           <Image
-            src={settings.logoUrl || "/brand/logo-white.png"}
+            src={settings.logoUrl || "/brand/logo-white-mark.webp"}
             alt={settings.name}
-            width={36}
+            width={64}
             height={36}
             unoptimized
-            className="size-9 object-contain"
+            className="h-9 w-auto object-contain"
           />
           <span className="flex flex-col leading-tight">
             <span className="text-sm font-semibold text-brand-fg">
@@ -65,12 +65,12 @@ export default async function AdminLayout({
             <AdminNavMobile flags={navFlags} />
             <Link href="/admin" className="flex items-center gap-2">
               <Image
-                src={settings.logoUrl || "/brand/logo.jpg"}
+                src={settings.logoUrl || "/brand/logo-mark.webp"}
                 alt={settings.name}
-                width={30}
-                height={30}
+                width={50}
+                height={28}
                 unoptimized
-                className="size-7 shrink-0 rounded-full object-cover"
+                className="h-7 w-auto shrink-0 object-contain"
               />
               <span className="text-sm font-semibold text-brand">
                 Admin

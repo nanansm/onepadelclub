@@ -231,10 +231,9 @@ a {
   color: var(--text);
 }
 .opc-logo img {
-  height: 34px;
-  width: 34px;
-  border-radius: 50%;
-  object-fit: cover;
+  height: 30px;
+  width: auto;
+  object-fit: contain;
 }
 .opc-nav-links {
   display: flex;

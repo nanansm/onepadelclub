@@ -9,12 +9,12 @@ export async function SiteHeader({ title }: { title?: string }) {
       <div className="mx-auto flex max-w-3xl items-center gap-2 px-4 py-3 sm:gap-3 sm:px-5">
         <Link href="/" className="flex shrink-0 items-center gap-2">
           <Image
-            src={s.logoUrl || "/brand/logo.jpg"}
+            src={s.logoUrl || "/brand/logo-mark.webp"}
             alt={s.name}
-            width={32}
+            width={58}
             height={32}
             unoptimized
-            className="h-8 w-8 rounded-full object-cover"
+            className="h-8 w-auto object-contain"
           />
           <span className="whitespace-nowrap font-semibold text-brand">
             {s.name}
