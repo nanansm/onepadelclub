@@ -107,6 +107,7 @@ const settingsSchema = z.object({
   evoApiKey: z.string().optional(), // write-only
   waTemplateBooking: z.string().trim().max(2000).optional().default(""),
   waTemplatePaid: z.string().trim().max(2000).optional().default(""),
+  waTemplateReminder: z.string().trim().max(2000).optional().default(""),
   // Payment gateway (scaffold)
   gatewayProvider: z.string().trim().optional().default(""),
   gatewayClientKey: z.string().trim().optional().default(""),

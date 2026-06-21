@@ -102,6 +102,7 @@ export const venue = onepadel.table("venue", {
   // {detail} {total} {link}. Kosong -> pakai template bawaan.
   waTemplateBooking: text("wa_template_booking"),
   waTemplatePaid: text("wa_template_paid"),
+  waTemplateReminder: text("wa_template_reminder"),
   // --- Payment gateway (scaffold, nonaktif sampai key diisi). ---
   gatewayProvider: text("gateway_provider"), // mis. "midtrans" | "xendit"
   gatewayServerKey: text("gateway_server_key"), // server-only
@@ -154,6 +155,8 @@ export const courtBooking = onepadel.table(
     notes: text("notes"),
     // Asal booking: "web" (online) atau "kasir" (input admin/walk-in).
     source: text("source").notNull().default("web"),
+    // Reminder WA H-1 sudah dikirim? (lazy, tanpa cron).
+    reminderSent: boolean("reminder_sent").notNull().default(false),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at")
       .notNull()

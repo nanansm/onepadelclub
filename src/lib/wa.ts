@@ -16,6 +16,7 @@ export type WaConfig = {
   apiKey: string;
   templateBooking: string;
   templatePaid: string;
+  templateReminder: string;
 };
 
 // Template bawaan (dipakai kalau owner tak isi). Placeholder di-replace.
@@ -23,6 +24,8 @@ export const DEFAULT_WA_BOOKING =
   "Halo {nama} 👋\n\nBooking *{jenis}* kamu sudah kami terima. Detail:\n• Kode: *{kode}*\n• Jadwal: {detail}\n• Total: {total}\n\nSlot di-hold sementara. Selesaikan pembayaran lalu kirim bukti ke chat ini ya 🙏\n{link}";
 export const DEFAULT_WA_PAID =
   "Halo {nama} ✅\n\nPembayaran *{jenis}* (kode *{kode}*) sudah kami terima dan *terkonfirmasi*.\n• Detail: {detail}\n\nSampai ketemu di lapangan, ya! 🎾\n{link}";
+export const DEFAULT_WA_REMINDER =
+  "Halo {nama} 👋\n\nPengingat: kamu ada jadwal *{jenis}* *besok*.\n• Detail: {detail}\n\nSampai ketemu di lapangan! 🎾";
 
 export async function getWaConfig(): Promise<WaConfig> {
   const v = (await db.select().from(venue).limit(1))[0];
@@ -33,6 +36,7 @@ export async function getWaConfig(): Promise<WaConfig> {
     apiKey: v?.evoApiKey || process.env.EVO_API_KEY || "",
     templateBooking: v?.waTemplateBooking?.trim() || DEFAULT_WA_BOOKING,
     templatePaid: v?.waTemplatePaid?.trim() || DEFAULT_WA_PAID,
+    templateReminder: v?.waTemplateReminder?.trim() || DEFAULT_WA_REMINDER,
   };
 }
 
@@ -148,6 +152,18 @@ export async function notifyCustomerPaidWa(p: BookingNotif): Promise<void> {
   if (!cfg.enabled || !p.wa) return;
   await sendWa(
     { to: p.wa, text: renderTemplate(cfg.templatePaid, templateVars(p)) },
+    cfg,
+  );
+}
+
+// Pengingat H-1. cfg dioper supaya pemanggil batch tak query berkali-kali.
+export async function notifyCustomerReminderWa(
+  p: BookingNotif,
+  cfg: WaConfig,
+): Promise<void> {
+  if (!cfg.enabled || !p.wa) return;
+  await sendWa(
+    { to: p.wa, text: renderTemplate(cfg.templateReminder, templateVars(p)) },
     cfg,
   );
 }

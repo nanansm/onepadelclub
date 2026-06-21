@@ -82,6 +82,7 @@ export type Settings = {
   evoApiKeySet: boolean;
   waTemplateBooking: string; // kosong = pakai bawaan
   waTemplatePaid: string;
+  waTemplateReminder: string;
   // Payment gateway (scaffold) — serverKey server-only
   gatewayProvider: string;
   gatewayClientKey: string;
@@ -201,6 +202,7 @@ export const DEFAULTS: Settings = {
   evoApiKeySet: false,
   waTemplateBooking: "",
   waTemplatePaid: "",
+  waTemplateReminder: "",
   gatewayProvider: "",
   gatewayClientKey: "",
   gatewayServerKeySet: false,
@@ -271,6 +273,7 @@ export function mergeSettings(v: Venue | null): Settings {
     evoApiKeySet: Boolean(v.evoApiKey && v.evoApiKey.length > 0),
     waTemplateBooking: v.waTemplateBooking ?? "",
     waTemplatePaid: v.waTemplatePaid ?? "",
+    waTemplateReminder: v.waTemplateReminder ?? "",
     gatewayProvider: str(v.gatewayProvider, DEFAULTS.gatewayProvider),
     gatewayClientKey: str(v.gatewayClientKey, DEFAULTS.gatewayClientKey),
     gatewayServerKeySet: Boolean(v.gatewayServerKey && v.gatewayServerKey.length > 0),

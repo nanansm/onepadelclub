@@ -142,6 +142,9 @@ export function SettingsForm({ settings }: { settings: Settings }) {
     settings.waTemplateBooking,
   );
   const [waTemplatePaid, setWaTemplatePaid] = useState(settings.waTemplatePaid);
+  const [waTemplateReminder, setWaTemplateReminder] = useState(
+    settings.waTemplateReminder,
+  );
   // Payment gateway scaffold (serverKey write-only)
   const [gatewayProvider, setGatewayProvider] = useState(settings.gatewayProvider);
   const [gatewayClientKey, setGatewayClientKey] = useState(settings.gatewayClientKey);
@@ -394,6 +397,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
       evoInstance,
       waTemplateBooking,
       waTemplatePaid,
+      waTemplateReminder,
       gatewayProvider,
       gatewayClientKey,
       // secret write-only: kirim hanya kalau diketik
@@ -849,6 +853,15 @@ export function SettingsForm({ settings }: { settings: Settings }) {
                 onChange={(e) => setWaTemplatePaid(e.target.value)}
                 rows={5}
                 placeholder={"Halo {nama} ✅\nPembayaran *{jenis}* ..."}
+                className={inputClass}
+              />
+            </Field>
+            <Field label="Pengingat H-1 (dikirim otomatis sehari sebelum main)">
+              <textarea
+                value={waTemplateReminder}
+                onChange={(e) => setWaTemplateReminder(e.target.value)}
+                rows={4}
+                placeholder={"Halo {nama} 👋\nPengingat: jadwal *{jenis}* besok ..."}
                 className={inputClass}
               />
             </Field>

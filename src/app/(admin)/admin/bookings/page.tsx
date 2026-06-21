@@ -2,6 +2,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { AdminPageHeader } from "@/components/admin/page-header";
 import { getUpcomingBookings } from "@/lib/booking";
 import { expireStaleBookings } from "@/lib/expire";
+import { sendDueReminders } from "@/lib/reminder";
 import { getCourts } from "@/lib/venue";
 import { getSettings } from "@/lib/settings";
 import { posTotalsByBooking } from "@/lib/pos";
@@ -17,6 +18,7 @@ export default async function AdminBookingsPage() {
   // Rapikan PENDING basi -> CANCELLED dulu supaya daftar di bawah jujur
   // (PENDING = beneran nunggu bayar). Tanpa cron.
   await expireStaleBookings();
+  void sendDueReminders(); // pengingat H-1, fire-and-forget
   const [rows, courts, settings] = await Promise.all([
     getUpcomingBookings(),
     getCourts(),

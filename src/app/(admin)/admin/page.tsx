@@ -19,6 +19,7 @@ import {
 import { db } from "@/db";
 import { courtBooking } from "@/db/schema";
 import { expireStaleBookings } from "@/lib/expire";
+import { sendDueReminders } from "@/lib/reminder";
 import { getSettings } from "@/lib/settings";
 import { todayJakarta } from "@/lib/tz";
 import { rupiah } from "@/lib/utils";
@@ -95,6 +96,7 @@ const manageTiles: {
 export default async function AdminDashboard() {
   // Rapikan PENDING basi dulu agar angka "perlu konfirmasi" akurat. Tanpa cron.
   await expireStaleBookings();
+  void sendDueReminders(); // pengingat H-1, fire-and-forget
   const today = todayJakarta();
 
   const [stats] = await db
