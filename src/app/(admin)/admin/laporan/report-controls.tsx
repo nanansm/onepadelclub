@@ -30,8 +30,23 @@ export function ReportControls({
     router.push(`/admin/laporan?from=${nf}&to=${nt}`);
   }
 
+  // Hitung rentang preset dari string today (YYYY-MM-DD), tanpa lib.
+  const ymd = (d: Date) => d.toISOString().slice(0, 10);
+  const todayDate = new Date(`${today}T00:00:00`);
+  const days7Start = ymd(
+    new Date(todayDate.getTime() - 6 * 24 * 60 * 60 * 1000),
+  );
+  const prevMonthEnd = new Date(`${monthStart}T00:00:00`);
+  prevMonthEnd.setDate(0); // hari terakhir bulan lalu
+  const prevMonthStart = new Date(prevMonthEnd);
+  prevMonthStart.setDate(1);
+  const lastMonthFrom = ymd(prevMonthStart);
+  const lastMonthTo = ymd(prevMonthEnd);
+
   const isToday = from === today && to === today;
   const isMonth = from === monthStart && to === today;
+  const is7 = from === days7Start && to === today;
+  const isLastMonth = from === lastMonthFrom && to === lastMonthTo;
 
   function exportCsv() {
     const lines = [
@@ -59,7 +74,7 @@ export function ReportControls({
 
   return (
     <div className="flex flex-wrap items-end gap-3 rounded-2xl border bg-card p-4">
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button
           type="button"
           onClick={() => go(today, today)}
@@ -69,10 +84,24 @@ export function ReportControls({
         </button>
         <button
           type="button"
+          onClick={() => go(days7Start, today)}
+          className={`${presetBtn} ${is7 ? presetActive : ""}`}
+        >
+          7 Hari
+        </button>
+        <button
+          type="button"
           onClick={() => go(monthStart, today)}
           className={`${presetBtn} ${isMonth ? presetActive : ""}`}
         >
           Bulan Ini
+        </button>
+        <button
+          type="button"
+          onClick={() => go(lastMonthFrom, lastMonthTo)}
+          className={`${presetBtn} ${isLastMonth ? presetActive : ""}`}
+        >
+          Bulan Lalu
         </button>
       </div>
 

@@ -58,9 +58,13 @@ export function Cashier({
   const [customerName, setCustomerName] = useState("");
   const [bookingId, setBookingId] = useState("");
   const [busy, setBusy] = useState(false);
-  const [lastSale, setLastSale] = useState<{ code: string; total: number } | null>(
-    null,
-  );
+  const [payOpen, setPayOpen] = useState(false);
+  const [tendered, setTendered] = useState("");
+  const [lastSale, setLastSale] = useState<{
+    code: string;
+    total: number;
+    change?: number;
+  } | null>(null);
   const scanRef = useRef<HTMLInputElement>(null);
 
   // Kategori yang benar-benar ada produknya.
@@ -130,7 +134,21 @@ export function Cashier({
   const tax = Math.round(((subtotal - disc) * taxPercent) / 100);
   const total = subtotal - disc + tax;
 
-  async function checkout() {
+  const tenderedNum = Number(tendered) || 0;
+  const change = tenderedNum - total;
+
+  // Tombol "Bayar": tunai → buka modal uang diterima; non-tunai → langsung.
+  function onPay() {
+    if (!cart.length) return;
+    if (pay === "CASH") {
+      setTendered("");
+      setPayOpen(true);
+    } else {
+      void checkout();
+    }
+  }
+
+  async function checkout(changeVal?: number) {
     if (!cart.length) return;
     setBusy(true);
     const res = await createSaleAction({
@@ -146,14 +164,29 @@ export function Cashier({
       return;
     }
     toast.success(`Transaksi ${res.code} berhasil`);
-    setLastSale({ code: res.code!, total: res.total ?? total });
+    setLastSale({
+      code: res.code!,
+      total: res.total ?? total,
+      change: changeVal,
+    });
     setCart([]);
     setDiscount("");
     setCustomerName("");
     setPay("CASH");
     setBookingId("");
+    setTendered("");
+    setPayOpen(false);
     router.refresh();
   }
+
+  // Saran nominal uang cepat: pas, lalu pecahan umum di atas total.
+  const quickCash = (() => {
+    const set = new Set<number>([total]);
+    for (const d of [5000, 10000, 20000, 50000, 100000]) {
+      set.add(Math.ceil(total / d) * d);
+    }
+    return [...set].filter((n) => n >= total).sort((a, b) => a - b).slice(0, 5);
+  })();
 
   return (
     <div className="space-y-4">
@@ -165,6 +198,13 @@ export function Cashier({
             <span className="text-sm font-medium">
               Transaksi <strong>{lastSale.code}</strong> berhasil ·{" "}
               {rupiah(lastSale.total)}
+              {lastSale.change != null && lastSale.change > 0 ? (
+                <>
+                  {" "}
+                  · Kembalian{" "}
+                  <strong>{rupiah(lastSale.change)}</strong>
+                </>
+              ) : null}
             </span>
           </div>
           <div className="flex gap-2">
@@ -385,7 +425,7 @@ export function Cashier({
 
           <button
             type="button"
-            onClick={checkout}
+            onClick={onPay}
             disabled={busy || cart.length === 0}
             className="mt-3 w-full rounded-lg bg-brand px-4 py-3 font-semibold text-brand-fg transition active:scale-[0.99] disabled:opacity-50"
           >
@@ -394,6 +434,86 @@ export function Cashier({
         </div>
       </div>
       </div>
+
+      {/* Modal bayar tunai — uang diterima + kembalian (untuk kasir non-teknis) */}
+      {payOpen ? (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4">
+          <div className="w-full max-w-md rounded-t-2xl border bg-card p-5 shadow-xl sm:rounded-2xl">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Pembayaran Tunai</h3>
+              <button
+                type="button"
+                onClick={() => setPayOpen(false)}
+                className="rounded-lg p-1 text-muted hover:bg-cream/40"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between rounded-xl bg-cream/40 px-4 py-3">
+              <span className="text-sm text-muted">Total tagihan</span>
+              <span className="text-xl font-bold text-brand">{rupiah(total)}</span>
+            </div>
+
+            <label className="mt-4 block">
+              <span className="text-xs font-medium text-muted">Uang diterima</span>
+              <input
+                type="number"
+                inputMode="numeric"
+                min={0}
+                value={tendered}
+                onChange={(e) => setTendered(e.target.value)}
+                autoFocus
+                placeholder="0"
+                className="mt-1 w-full rounded-lg border bg-white px-3 py-3 text-lg font-semibold outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"
+              />
+            </label>
+
+            {/* Tombol nominal cepat */}
+            <div className="mt-2 flex flex-wrap gap-2">
+              {quickCash.map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => setTendered(String(n))}
+                  className="rounded-lg border px-3 py-1.5 text-sm font-medium hover:bg-cream/40"
+                >
+                  {n === total ? "Uang pas" : rupiah(n)}
+                </button>
+              ))}
+            </div>
+
+            {/* Kembalian */}
+            <div className="mt-4 flex items-center justify-between rounded-xl border px-4 py-3">
+              <span className="text-sm font-medium">Kembalian</span>
+              <span
+                className={`text-xl font-bold ${
+                  tenderedNum === 0
+                    ? "text-muted"
+                    : change < 0
+                      ? "text-red-600"
+                      : "text-green-600"
+                }`}
+              >
+                {tenderedNum === 0
+                  ? "—"
+                  : change < 0
+                    ? `Kurang ${rupiah(-change)}`
+                    : rupiah(change)}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => checkout(change)}
+              disabled={busy || tenderedNum < total}
+              className="mt-4 w-full rounded-lg bg-brand px-4 py-3 font-semibold text-brand-fg transition active:scale-[0.99] disabled:opacity-50"
+            >
+              {busy ? "Memproses…" : "Selesaikan Pembayaran"}
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
