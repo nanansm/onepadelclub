@@ -119,6 +119,9 @@ export const posOrderItem = onepadel.table(
     }),
     nameSnapshot: text("name_snapshot").notNull(),
     priceSnapshot: integer("price_snapshot").notNull(),
+    // Modal saat transaksi — dibekukan supaya laba kotor akurat walau modal
+    // produk berubah / produk dihapus kemudian.
+    costSnapshot: integer("cost_snapshot").notNull().default(0),
     qty: integer("qty").notNull().default(1),
     lineTotal: integer("line_total").notNull().default(0),
   },

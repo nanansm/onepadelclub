@@ -10,7 +10,6 @@ import {
   membershipPlan,
   posOrder,
   posOrderItem,
-  product,
   cashShift,
 } from "@/db/schema";
 
@@ -24,7 +23,7 @@ export type ReportRow = {
 export type Report = {
   rows: ReportRow[];
   total: number;
-  posGrossProfit: number; // perkiraan (modal saat ini)
+  posGrossProfit: number; // akurat: pakai modal snapshot saat transaksi
 };
 
 const PAID_STATUSES = ["PAID", "COMPLETED"] as const;
@@ -119,14 +118,13 @@ export async function getRevenueReport(
           between(posOrder.createdAt, fromTs, toTs),
         ),
       ),
-    // Laba kotor POS = penjualan item − (qty × modal produk saat ini)
+    // Laba kotor POS = penjualan item − (qty × modal saat transaksi/snapshot).
     db
       .select({
-        profit: sql<number>`coalesce(sum(${posOrderItem.lineTotal} - ${posOrderItem.qty} * coalesce(${product.cost}, 0)), 0)`,
+        profit: sql<number>`coalesce(sum(${posOrderItem.lineTotal} - ${posOrderItem.qty} * ${posOrderItem.costSnapshot}), 0)`,
       })
       .from(posOrderItem)
       .innerJoin(posOrder, eq(posOrder.id, posOrderItem.orderId))
-      .leftJoin(product, eq(product.id, posOrderItem.productId))
       .where(
         and(
           eq(posOrder.status, "PAID"),

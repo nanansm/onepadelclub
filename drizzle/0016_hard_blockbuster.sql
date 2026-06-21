@@ -1,0 +1,1 @@
+ALTER TABLE "onepadel"."pos_order_item" ADD COLUMN "cost_snapshot" integer DEFAULT 0 NOT NULL;

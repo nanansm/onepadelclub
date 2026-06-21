@@ -117,8 +117,8 @@ export async function notifyCustomerPaidWa(p: BookingNotif): Promise<void> {
   const lines = [
     `Halo ${p.nama ?? "kak"} ✅`,
     "",
-    `Pembayaran untuk *${p.jenis}*${p.kode ? ` (kode *${p.kode}*)` : ""} sudah kami terima. Booking kamu *terkonfirmasi*.`,
-    p.detail ? `\n• Jadwal: ${p.detail}` : "",
+    `Pembayaran untuk *${p.jenis}*${p.kode ? ` (kode *${p.kode}*)` : ""} sudah kami terima dan *terkonfirmasi*.`,
+    p.detail ? `\n• Detail: ${p.detail}` : "",
     "",
     "Sampai ketemu di lapangan, ya! 🎾",
     invoiceUrl(p) ? `\nDetail booking:\n${invoiceUrl(p)}` : "",

@@ -7,6 +7,8 @@ import { db } from "@/db";
 import { openPlayRegistration, openPlaySession, venue } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
 import { findConflict } from "@/lib/availability";
+import { fireWa, notifyCustomerPaidWa } from "@/lib/wa";
+import { hourLabel } from "@/lib/format";
 
 type Result = { ok: boolean; error?: string };
 
@@ -64,8 +66,41 @@ export async function confirmRegAction(id: string): Promise<Result> {
     .where(
       and(eq(openPlayRegistration.id, id), eq(openPlayRegistration.status, "PENDING")),
     )
-    .returning({ id: openPlayRegistration.id });
+    .returning({
+      code: openPlayRegistration.code,
+      nama: openPlayRegistration.customerName,
+      wa: openPlayRegistration.customerWa,
+      sessionId: openPlayRegistration.sessionId,
+    });
   if (updated.length === 0) return { ok: false, error: "Tidak bisa dikonfirmasi" };
+
+  // WA "pembayaran terkonfirmasi" ke customer (fire-and-forget).
+  const r = updated[0];
+  const s = (
+    await db
+      .select({
+        title: openPlaySession.title,
+        date: openPlaySession.date,
+        startHour: openPlaySession.startHour,
+      })
+      .from(openPlaySession)
+      .where(eq(openPlaySession.id, r.sessionId))
+      .limit(1)
+  )[0];
+  const detail = s
+    ? `${s.title} · ${s.date} · ${hourLabel(s.startHour)}`
+    : undefined;
+  fireWa(() =>
+    notifyCustomerPaidWa({
+      jenis: "Open Play",
+      kode: r.code,
+      nama: r.nama,
+      wa: r.wa,
+      detail,
+      invoicePath: `/open-play/${r.code}`,
+    }),
+  );
+
   revalidatePath("/admin/open-play");
   return { ok: true };
 }

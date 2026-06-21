@@ -161,6 +161,7 @@ export async function createSale(input: SaleInput): Promise<SaleResult> {
           productId: l.p.id,
           nameSnapshot: l.p.name,
           priceSnapshot: l.p.price,
+          costSnapshot: l.p.cost,
           qty: l.qty,
           lineTotal: l.p.price * l.qty,
         });

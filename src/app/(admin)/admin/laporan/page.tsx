@@ -60,7 +60,7 @@ export default async function LaporanPage({
         />
         {settings.posEnabled ? (
           <Card
-            label="Laba Kotor POS (perkiraan)"
+            label="Laba Kotor POS"
             value={rupiah(report.posGrossProfit)}
           />
         ) : (
@@ -175,7 +175,8 @@ export default async function LaporanPage({
 
       <p className="mt-4 text-xs text-muted">
         Booking dihitung berdasarkan tanggal main; POS berdasarkan tanggal
-        transaksi. Laba kotor POS pakai modal produk saat ini (perkiraan).
+        transaksi. Laba kotor POS = harga jual − modal yang dibekukan saat
+        transaksi.
       </p>
     </div>
   );

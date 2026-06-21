@@ -8,6 +8,7 @@ import { membership, membershipPlan } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
 import { logAudit } from "@/lib/audit";
 import { todayJakarta, ymdOffset } from "@/lib/tz";
+import { fireWa, notifyCustomerPaidWa } from "@/lib/wa";
 
 type Result = { ok: boolean; error?: string };
 
@@ -60,7 +61,11 @@ export async function activateMembershipAction(id: string): Promise<Result> {
   await requireAdmin();
   const row = (
     await db
-      .select({ m: membership, days: membershipPlan.durationDays })
+      .select({
+        m: membership,
+        days: membershipPlan.durationDays,
+        planName: membershipPlan.name,
+      })
       .from(membership)
       .innerJoin(membershipPlan, eq(membership.planId, membershipPlan.id))
       .where(eq(membership.id, id))
@@ -71,13 +76,27 @@ export async function activateMembershipAction(id: string): Promise<Result> {
     return { ok: false, error: "Hanya membership PENDING yang bisa diaktifkan" };
   }
   const start = todayJakarta();
+  const end = ymdOffset(start, row.days);
   const updated = await db
     .update(membership)
-    .set({ status: "ACTIVE", startDate: start, endDate: ymdOffset(start, row.days) })
+    .set({ status: "ACTIVE", startDate: start, endDate: end })
     .where(and(eq(membership.id, id), eq(membership.status, "PENDING")))
     .returning({ id: membership.id });
   if (updated.length === 0) return { ok: false, error: "Gagal mengaktifkan" };
   await logAudit("activate", "membership", id);
+
+  // WA "membership aktif" ke customer (fire-and-forget).
+  fireWa(() =>
+    notifyCustomerPaidWa({
+      jenis: "Membership",
+      kode: row.m.code,
+      nama: row.m.customerName,
+      wa: row.m.customerWa,
+      detail: `Paket ${row.planName} · aktif s/d ${end}`,
+      invoicePath: `/membership/${row.m.code}`,
+    }),
+  );
+
   revalidatePath("/admin/membership");
   return { ok: true };
 }

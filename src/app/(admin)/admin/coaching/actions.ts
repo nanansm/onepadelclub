@@ -6,6 +6,9 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { coach, coachingBooking } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
+import { fireWa, notifyCustomerPaidWa } from "@/lib/wa";
+import { rangeLabel } from "@/lib/format";
+import { rupiah } from "@/lib/utils";
 
 type Result = { ok: boolean; error?: string };
 
@@ -63,8 +66,40 @@ export async function confirmCoachingAction(id: string): Promise<Result> {
     .update(coachingBooking)
     .set({ status: "PAID" })
     .where(and(eq(coachingBooking.id, id), eq(coachingBooking.status, "PENDING")))
-    .returning({ id: coachingBooking.id });
+    .returning({
+      code: coachingBooking.code,
+      nama: coachingBooking.customerName,
+      wa: coachingBooking.customerWa,
+      coachId: coachingBooking.coachId,
+      date: coachingBooking.date,
+      startHour: coachingBooking.startHour,
+      duration: coachingBooking.duration,
+      totalPrice: coachingBooking.totalPrice,
+    });
   if (u.length === 0) return { ok: false, error: "Tidak bisa dikonfirmasi" };
+
+  // WA "pembayaran terkonfirmasi" ke customer (fire-and-forget).
+  const b = u[0];
+  const c = (
+    await db
+      .select({ name: coach.name })
+      .from(coach)
+      .where(eq(coach.id, b.coachId))
+      .limit(1)
+  )[0];
+  const detail = `${c?.name ?? "Coaching"} · ${b.date} · ${rangeLabel(b.startHour, b.duration)}`;
+  fireWa(() =>
+    notifyCustomerPaidWa({
+      jenis: "Coaching",
+      kode: b.code,
+      nama: b.nama,
+      wa: b.wa,
+      detail,
+      total: rupiah(b.totalPrice),
+      invoicePath: `/coaching/${b.code}`,
+    }),
+  );
+
   revalidatePath("/admin/coaching");
   return { ok: true };
 }
