@@ -96,6 +96,7 @@ const settingsSchema = z.object({
   smtpPassword: z.string().optional(),
   // --- Produk white-label (v2) ---
   ligaEnabled: coerceBool.default(false),
+  ligaName: z.string().trim().optional().default(""),
   posEnabled: coerceBool.default(false),
   taxPercent: z.coerce.number().int().min(0).max(100).default(0),
   paymentMode: z.enum(["MANUAL", "GATEWAY", "BOTH"]).default("MANUAL"),
@@ -104,6 +105,8 @@ const settingsSchema = z.object({
   evoBaseUrl: z.string().trim().optional().default(""),
   evoInstance: z.string().trim().optional().default(""),
   evoApiKey: z.string().optional(), // write-only
+  waTemplateBooking: z.string().trim().max(2000).optional().default(""),
+  waTemplatePaid: z.string().trim().max(2000).optional().default(""),
   // Payment gateway (scaffold)
   gatewayProvider: z.string().trim().optional().default(""),
   gatewayClientKey: z.string().trim().optional().default(""),

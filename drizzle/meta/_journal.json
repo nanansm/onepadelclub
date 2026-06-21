@@ -127,6 +127,20 @@
       "when": 1782020037619,
       "tag": "0017_happy_famine",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1782021249523,
+      "tag": "0018_adorable_bishop",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1782021373275,
+      "tag": "0019_remarkable_freak",
+      "breakpoints": true
     }
   ]
 }

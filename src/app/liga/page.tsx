@@ -6,13 +6,16 @@ import {
   getKlasemenData,
   getLiveMatchesWithTeams,
 } from "@/lib/liga";
+import { getSettings } from "@/lib/settings";
 import type { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Liga Padel",
-  description:
-    "Klasemen real-time, jadwal, live score, dan profil tim Liga Padel.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const s = await getSettings();
+  return {
+    title: s.ligaName,
+    description: `Klasemen real-time, jadwal, live score, dan profil tim ${s.ligaName}.`,
+  };
+}
 
 export const dynamic = "force-dynamic";
 
@@ -25,10 +28,11 @@ const nav = [
 ];
 
 export default async function LigaHubPage() {
-  const [season, data, live] = await Promise.all([
+  const [season, data, live, settings] = await Promise.all([
     getActiveSeason(),
     getKlasemenData(),
     getLiveMatchesWithTeams(),
+    getSettings(),
   ]);
 
   return (
@@ -36,8 +40,7 @@ export default async function LigaHubPage() {
       <LigaHeader />
       <main className="mx-auto max-w-3xl px-5 py-6">
         <PageHeading
-          plain="Liga Padel"
-          accent="Padel"
+          plain={settings.ligaName}
           sub={season ? `${season.name} · ${season.year}` : undefined}
         />
 

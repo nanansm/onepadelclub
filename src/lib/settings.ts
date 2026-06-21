@@ -71,6 +71,7 @@ export type Settings = {
   // --- Produk white-label (v2) ---
   // modul toggle
   ligaEnabled: boolean;
+  ligaName: string;
   posEnabled: boolean;
   taxPercent: number;
   paymentMode: "MANUAL" | "GATEWAY" | "BOTH";
@@ -79,6 +80,8 @@ export type Settings = {
   evoBaseUrl: string;
   evoInstance: string;
   evoApiKeySet: boolean;
+  waTemplateBooking: string; // kosong = pakai bawaan
+  waTemplatePaid: string;
   // Payment gateway (scaffold) — serverKey server-only
   gatewayProvider: string;
   gatewayClientKey: string;
@@ -188,6 +191,7 @@ export const DEFAULTS: Settings = {
   smtpFromEmail: "",
   smtpPasswordSet: false,
   ligaEnabled: false,
+  ligaName: "Liga Komunitas",
   posEnabled: false,
   taxPercent: 0,
   paymentMode: "MANUAL",
@@ -195,6 +199,8 @@ export const DEFAULTS: Settings = {
   evoBaseUrl: "",
   evoInstance: "",
   evoApiKeySet: false,
+  waTemplateBooking: "",
+  waTemplatePaid: "",
   gatewayProvider: "",
   gatewayClientKey: "",
   gatewayServerKeySet: false,
@@ -255,6 +261,7 @@ export function mergeSettings(v: Venue | null): Settings {
     // Hanya penanda boolean — nilai password tak pernah keluar dari server.
     smtpPasswordSet: Boolean(v.smtpPassword && v.smtpPassword.length > 0),
     ligaEnabled: v.ligaEnabled ?? DEFAULTS.ligaEnabled,
+    ligaName: str(v.ligaName, DEFAULTS.ligaName),
     posEnabled: v.posEnabled ?? DEFAULTS.posEnabled,
     taxPercent: v.taxPercent ?? DEFAULTS.taxPercent,
     paymentMode: (v.paymentMode as Settings["paymentMode"]) || DEFAULTS.paymentMode,
@@ -262,6 +269,8 @@ export function mergeSettings(v: Venue | null): Settings {
     evoBaseUrl: str(v.evoBaseUrl, DEFAULTS.evoBaseUrl),
     evoInstance: str(v.evoInstance, DEFAULTS.evoInstance),
     evoApiKeySet: Boolean(v.evoApiKey && v.evoApiKey.length > 0),
+    waTemplateBooking: v.waTemplateBooking ?? "",
+    waTemplatePaid: v.waTemplatePaid ?? "",
     gatewayProvider: str(v.gatewayProvider, DEFAULTS.gatewayProvider),
     gatewayClientKey: str(v.gatewayClientKey, DEFAULTS.gatewayClientKey),
     gatewayServerKeySet: Boolean(v.gatewayServerKey && v.gatewayServerKey.length > 0),

@@ -129,6 +129,7 @@ export function SettingsForm({ settings }: { settings: Settings }) {
 
   // Modul & produk (v2)
   const [ligaEnabled, setLigaEnabled] = useState(settings.ligaEnabled);
+  const [ligaName, setLigaName] = useState(settings.ligaName);
   const [posEnabled, setPosEnabled] = useState(settings.posEnabled);
   const [taxPercent, setTaxPercent] = useState(String(settings.taxPercent));
   const [paymentMode, setPaymentMode] = useState(settings.paymentMode);
@@ -137,6 +138,10 @@ export function SettingsForm({ settings }: { settings: Settings }) {
   const [evoBaseUrl, setEvoBaseUrl] = useState(settings.evoBaseUrl);
   const [evoInstance, setEvoInstance] = useState(settings.evoInstance);
   const [evoApiKey, setEvoApiKey] = useState("");
+  const [waTemplateBooking, setWaTemplateBooking] = useState(
+    settings.waTemplateBooking,
+  );
+  const [waTemplatePaid, setWaTemplatePaid] = useState(settings.waTemplatePaid);
   // Payment gateway scaffold (serverKey write-only)
   const [gatewayProvider, setGatewayProvider] = useState(settings.gatewayProvider);
   const [gatewayClientKey, setGatewayClientKey] = useState(settings.gatewayClientKey);
@@ -380,12 +385,15 @@ export function SettingsForm({ settings }: { settings: Settings }) {
       ...(smtpPassword ? { smtpPassword } : {}),
       // modul & produk (v2)
       ligaEnabled,
+      ligaName,
       posEnabled,
       taxPercent: Number(taxPercent),
       paymentMode,
       waEnabled,
       evoBaseUrl,
       evoInstance,
+      waTemplateBooking,
+      waTemplatePaid,
       gatewayProvider,
       gatewayClientKey,
       // secret write-only: kirim hanya kalau diketik
@@ -480,6 +488,16 @@ export function SettingsForm({ settings }: { settings: Settings }) {
               Aktifkan modul <strong>Liga</strong> (klasemen, jadwal, live score). Matikan kalau klub tak punya liga.
             </span>
           </label>
+          {ligaEnabled ? (
+            <Field label="Nama liga (tampil di halaman liga)">
+              <input
+                value={ligaName}
+                onChange={(e) => setLigaName(e.target.value)}
+                placeholder="Liga Komunitas"
+                className={inputClass}
+              />
+            </Field>
+          ) : null}
           <label className="flex items-center gap-3">
             <input
               type="checkbox"
@@ -807,6 +825,35 @@ export function SettingsForm({ settings }: { settings: Settings }) {
           <p className="text-xs text-muted">
             Pakai instance Evolution API milikmu (self-hosted). Notif terkirim ke nomor WA pelanggan saat booking dibuat & dikonfirmasi.
           </p>
+
+          <div className="space-y-3 border-t pt-4">
+            <p className="text-sm font-medium">Template Pesan (opsional)</p>
+            <p className="text-xs text-muted">
+              Placeholder: <code>{"{nama}"}</code> <code>{"{jenis}"}</code>{" "}
+              <code>{"{kode}"}</code> <code>{"{detail}"}</code>{" "}
+              <code>{"{total}"}</code> <code>{"{link}"}</code>. Kosongkan = pakai
+              teks bawaan.
+            </p>
+            <Field label="Saat booking dibuat">
+              <textarea
+                value={waTemplateBooking}
+                onChange={(e) => setWaTemplateBooking(e.target.value)}
+                rows={5}
+                placeholder={"Halo {nama} 👋\nBooking *{jenis}* ..."}
+                className={inputClass}
+              />
+            </Field>
+            <Field label="Saat pembayaran dikonfirmasi">
+              <textarea
+                value={waTemplatePaid}
+                onChange={(e) => setWaTemplatePaid(e.target.value)}
+                rows={5}
+                placeholder={"Halo {nama} ✅\nPembayaran *{jenis}* ..."}
+                className={inputClass}
+              />
+            </Field>
+          </div>
+
           <div className="flex flex-wrap items-center gap-3 border-t pt-4">
             <button
               type="button"

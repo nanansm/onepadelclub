@@ -324,7 +324,7 @@ export function LigaSection({ settings }: { settings: Settings }) {
     <section className="opc-section">
       <div className="opc-container">
         <div className="opc-feature">
-          <SectionTag>Liga Padel</SectionTag>
+          <SectionTag>{settings.ligaName}</SectionTag>
           <h2 className="opc-h2 opc-h2-big">{settings.ligaHeadline}</h2>
           <p className="opc-body">{settings.ligaBody}</p>
           <Link className="opc-btn opc-btn-primary" href="/liga">

@@ -87,6 +87,7 @@ export const venue = onepadel.table("venue", {
   // --- Produk white-label (v2). Semua additive & nullable/ber-default. ---
   // Modul toggle: sembunyikan fitur yang tak dipakai klien tertentu.
   ligaEnabled: boolean("liga_enabled").notNull().default(false),
+  ligaName: text("liga_name"), // nama liga (mis. "Liga Kota Intan")
   posEnabled: boolean("pos_enabled").notNull().default(false),
   // Pajak POS (PB1/PPN), persen. 0 = tanpa pajak.
   taxPercent: integer("tax_percent").notNull().default(0),
@@ -97,6 +98,10 @@ export const venue = onepadel.table("venue", {
   evoBaseUrl: text("evo_base_url"),
   evoInstance: text("evo_instance"),
   evoApiKey: text("evo_api_key"), // server-only, tak pernah dikirim ke client
+  // Template pesan WA (editable owner). Placeholder: {nama} {jenis} {kode}
+  // {detail} {total} {link}. Kosong -> pakai template bawaan.
+  waTemplateBooking: text("wa_template_booking"),
+  waTemplatePaid: text("wa_template_paid"),
   // --- Payment gateway (scaffold, nonaktif sampai key diisi). ---
   gatewayProvider: text("gateway_provider"), // mis. "midtrans" | "xendit"
   gatewayServerKey: text("gateway_server_key"), // server-only

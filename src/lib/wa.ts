@@ -14,7 +14,15 @@ export type WaConfig = {
   baseUrl: string;
   instance: string;
   apiKey: string;
+  templateBooking: string;
+  templatePaid: string;
 };
+
+// Template bawaan (dipakai kalau owner tak isi). Placeholder di-replace.
+export const DEFAULT_WA_BOOKING =
+  "Halo {nama} 👋\n\nBooking *{jenis}* kamu sudah kami terima. Detail:\n• Kode: *{kode}*\n• Jadwal: {detail}\n• Total: {total}\n\nSlot di-hold sementara. Selesaikan pembayaran lalu kirim bukti ke chat ini ya 🙏\n{link}";
+export const DEFAULT_WA_PAID =
+  "Halo {nama} ✅\n\nPembayaran *{jenis}* (kode *{kode}*) sudah kami terima dan *terkonfirmasi*.\n• Detail: {detail}\n\nSampai ketemu di lapangan, ya! 🎾\n{link}";
 
 export async function getWaConfig(): Promise<WaConfig> {
   const v = (await db.select().from(venue).limit(1))[0];
@@ -23,7 +31,28 @@ export async function getWaConfig(): Promise<WaConfig> {
     baseUrl: (v?.evoBaseUrl || process.env.EVO_BASE_URL || "").replace(/\/+$/, ""),
     instance: v?.evoInstance || process.env.EVO_INSTANCE || "",
     apiKey: v?.evoApiKey || process.env.EVO_API_KEY || "",
+    templateBooking: v?.waTemplateBooking?.trim() || DEFAULT_WA_BOOKING,
+    templatePaid: v?.waTemplatePaid?.trim() || DEFAULT_WA_PAID,
   };
+}
+
+// Isi placeholder + rapikan baris kosong sisa placeholder yang tak terpakai.
+function renderTemplate(tpl: string, vars: Record<string, string>): string {
+  let out = tpl.replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? "");
+  // Buang baris yang jadi kosong (mis. total/detail tak ada) & rapikan.
+  out = out
+    .split("\n")
+    .filter((line, i, arr) => {
+      const t = line.trim();
+      // buang baris bullet kosong "• X:" tanpa nilai
+      if (/^•\s*[^:]+:\s*$/.test(t)) return false;
+      // jangan biarkan >1 baris kosong beruntun
+      if (t === "" && arr[i - 1]?.trim() === "") return false;
+      return true;
+    })
+    .join("\n")
+    .trim();
+  return out;
 }
 
 function baseUrl(): string {
@@ -92,36 +121,33 @@ function invoiceUrl(p: BookingNotif): string {
   return p.invoicePath ? `${baseUrl()}${p.invoicePath}` : "";
 }
 
+function templateVars(p: BookingNotif): Record<string, string> {
+  return {
+    nama: p.nama ?? "kak",
+    jenis: p.jenis,
+    kode: p.kode ?? "",
+    detail: p.detail ?? "",
+    total: p.total ?? "",
+    link: invoiceUrl(p),
+  };
+}
+
 // Pesan ke customer saat booking dibuat (instruksi bayar).
 export async function notifyCustomerBookingWa(p: BookingNotif): Promise<void> {
   const cfg = await getWaConfig();
   if (!cfg.enabled || !p.wa) return;
-  const lines = [
-    `Halo ${p.nama ?? "kak"} 👋`,
-    "",
-    `Booking *${p.jenis}* kamu sudah kami terima. Berikut detailnya:`,
-    p.kode ? `• Kode: *${p.kode}*` : "",
-    p.detail ? `• Jadwal: ${p.detail}` : "",
-    p.total ? `• Total: ${p.total}` : "",
-    "",
-    "Slot di-hold sementara. Selesaikan pembayaran lalu kirim bukti ke chat ini ya 🙏",
-    invoiceUrl(p) ? `\nDetail & instruksi bayar:\n${invoiceUrl(p)}` : "",
-  ].filter((l) => l !== "");
-  await sendWa({ to: p.wa, text: lines.join("\n") });
+  await sendWa(
+    { to: p.wa, text: renderTemplate(cfg.templateBooking, templateVars(p)) },
+    cfg,
+  );
 }
 
 // Pesan ke customer saat pembayaran dikonfirmasi admin.
 export async function notifyCustomerPaidWa(p: BookingNotif): Promise<void> {
   const cfg = await getWaConfig();
   if (!cfg.enabled || !p.wa) return;
-  const lines = [
-    `Halo ${p.nama ?? "kak"} ✅`,
-    "",
-    `Pembayaran untuk *${p.jenis}*${p.kode ? ` (kode *${p.kode}*)` : ""} sudah kami terima dan *terkonfirmasi*.`,
-    p.detail ? `\n• Detail: ${p.detail}` : "",
-    "",
-    "Sampai ketemu di lapangan, ya! 🎾",
-    invoiceUrl(p) ? `\nDetail booking:\n${invoiceUrl(p)}` : "",
-  ].filter((l) => l !== "");
-  await sendWa({ to: p.wa, text: lines.join("\n") });
+  await sendWa(
+    { to: p.wa, text: renderTemplate(cfg.templatePaid, templateVars(p)) },
+    cfg,
+  );
 }

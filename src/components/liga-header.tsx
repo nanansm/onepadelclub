@@ -26,7 +26,7 @@ export async function LigaHeader() {
               unoptimized
               className="h-7 w-auto object-contain"
             />
-            <span className="font-semibold text-brand">{s.name} Liga</span>
+            <span className="font-semibold text-brand">{s.ligaName}</span>
           </Link>
         </div>
         <nav className="-mx-5 flex gap-1 overflow-x-auto px-5 pb-2 text-sm">
