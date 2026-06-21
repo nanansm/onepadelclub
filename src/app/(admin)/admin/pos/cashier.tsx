@@ -1,10 +1,19 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Plus, Minus, Trash2, ScanLine, X, Printer, CheckCircle2 } from "lucide-react";
+import {
+  Plus,
+  Minus,
+  Trash2,
+  ScanLine,
+  X,
+  Printer,
+  CheckCircle2,
+  PauseCircle,
+} from "lucide-react";
 import { rupiah } from "@/lib/utils";
 import { createSaleAction } from "./actions";
 
@@ -66,6 +75,77 @@ export function Cashier({
     change?: number;
   } | null>(null);
   const scanRef = useRef<HTMLInputElement>(null);
+
+  // --- Transaksi ditahan (park) — localStorage ---
+  type Held = {
+    id: string;
+    label: string;
+    savedAt: number;
+    lines: { productId: string; qty: number }[];
+    discount: string;
+    customerName: string;
+  };
+  const [held, setHeld] = useState<Held[]>([]);
+  const [showHeld, setShowHeld] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("pos_held");
+      if (raw) setHeld(JSON.parse(raw) as Held[]);
+    } catch {
+      // abaikan localStorage rusak
+    }
+  }, []);
+
+  function persistHeld(list: Held[]) {
+    setHeld(list);
+    try {
+      localStorage.setItem("pos_held", JSON.stringify(list));
+    } catch {
+      // storage penuh / private mode — abaikan
+    }
+  }
+
+  function holdCart() {
+    if (!cart.length) return;
+    const entry: Held = {
+      id: `${cart.length}-${cart.reduce((s, c) => s + c.qty, 0)}-${held.length}`,
+      label:
+        customerName.trim() ||
+        `${cart.length} item · ${rupiah(
+          cart.reduce((s, c) => s + c.product.price * c.qty, 0),
+        )}`,
+      savedAt: Date.now(),
+      lines: cart.map((c) => ({ productId: c.product.id, qty: c.qty })),
+      discount,
+      customerName,
+    };
+    persistHeld([entry, ...held]);
+    setCart([]);
+    setDiscount("");
+    setCustomerName("");
+    toast.success("Transaksi ditahan");
+  }
+
+  function resumeHold(h: Held) {
+    const items: CartItem[] = [];
+    let missing = 0;
+    for (const l of h.lines) {
+      const p = products.find((x) => x.id === l.productId);
+      if (p) items.push({ product: p, qty: l.qty });
+      else missing++;
+    }
+    setCart(items);
+    setDiscount(h.discount);
+    setCustomerName(h.customerName);
+    persistHeld(held.filter((x) => x.id !== h.id));
+    setShowHeld(false);
+    if (missing > 0) toast.warning(`${missing} produk sudah tak tersedia, dilewati`);
+  }
+
+  function deleteHold(id: string) {
+    persistHeld(held.filter((x) => x.id !== id));
+  }
 
   // Kategori yang benar-benar ada produknya.
   const cats = useMemo(() => {
@@ -241,6 +321,16 @@ export function Cashier({
             autoComplete="off"
           />
         </form>
+
+        {held.length > 0 ? (
+          <button
+            type="button"
+            onClick={() => setShowHeld(true)}
+            className="inline-flex items-center gap-2 rounded-lg border border-accent/40 bg-accent/10 px-3 py-2 text-sm font-medium text-accent hover:bg-accent/20"
+          >
+            <PauseCircle className="size-4" /> Transaksi ditahan ({held.length})
+          </button>
+        ) : null}
 
         {/* Tab kategori */}
         <div className="flex flex-wrap gap-2">
@@ -432,9 +522,70 @@ export function Cashier({
           >
             {busy ? "Memproses…" : `Bayar ${rupiah(total)}`}
           </button>
+          <button
+            type="button"
+            onClick={holdCart}
+            disabled={cart.length === 0}
+            className="mt-2 w-full rounded-lg border px-4 py-2 text-sm font-medium hover:bg-cream/40 disabled:opacity-40"
+          >
+            Tahan transaksi
+          </button>
         </div>
       </div>
       </div>
+
+      {/* Modal transaksi ditahan */}
+      {showHeld ? (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-4">
+          <div className="max-h-[80vh] w-full max-w-md overflow-y-auto rounded-t-2xl border bg-card p-5 shadow-xl sm:rounded-2xl">
+            <div className="mb-3 flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Transaksi Ditahan</h3>
+              <button
+                type="button"
+                onClick={() => setShowHeld(false)}
+                className="rounded-lg p-1 text-muted hover:bg-cream/40"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+            {held.length === 0 ? (
+              <p className="py-6 text-center text-sm text-muted">Tidak ada.</p>
+            ) : (
+              <ul className="space-y-2">
+                {held.map((h) => (
+                  <li
+                    key={h.id}
+                    className="flex items-center justify-between gap-2 rounded-lg border bg-white p-3"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium">{h.label}</p>
+                      <p className="text-xs text-muted">
+                        {h.lines.reduce((s, l) => s + l.qty, 0)} item
+                      </p>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => resumeHold(h)}
+                        className="rounded-lg bg-brand px-3 py-1.5 text-sm font-medium text-brand-fg"
+                      >
+                        Lanjutkan
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteHold(h.id)}
+                        className="rounded-lg border px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      ) : null}
 
       {/* Modal bayar tunai — uang diterima + kembalian (untuk kasir non-teknis) */}
       {payOpen ? (

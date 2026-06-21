@@ -4,7 +4,13 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { eq, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { product, stockMovement, cashShift } from "@/db/schema";
+import {
+  product,
+  stockMovement,
+  cashShift,
+  posOrder,
+  posOrderItem,
+} from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
 import { getVenue } from "@/lib/venue";
 import { logAudit } from "@/lib/audit";
@@ -64,6 +70,63 @@ export async function createSaleAction(
     revalidatePath("/admin/pos/produk");
   }
   return res;
+}
+
+// Batalkan (void) transaksi POS: status VOID + kembalikan stok produk.
+export async function voidSaleAction(id: string): Promise<ActionResult> {
+  await requireAdmin();
+  try {
+    await db.transaction(async (tx) => {
+      const order = (
+        await tx.select().from(posOrder).where(eq(posOrder.id, id)).limit(1)
+      )[0];
+      if (!order) throw new Error("Transaksi tidak ditemukan.");
+      if (order.status !== "PAID") throw new Error("Hanya transaksi lunas yang bisa dibatalkan.");
+
+      await tx
+        .update(posOrder)
+        .set({ status: "VOID" })
+        .where(eq(posOrder.id, id));
+
+      // Kembalikan stok untuk item yang dilacak stoknya.
+      const items = await tx
+        .select()
+        .from(posOrderItem)
+        .where(eq(posOrderItem.orderId, id));
+      for (const it of items) {
+        if (!it.productId) continue;
+        const p = (
+          await tx
+            .select({ trackStock: product.trackStock })
+            .from(product)
+            .where(eq(product.id, it.productId))
+            .limit(1)
+        )[0];
+        if (p?.trackStock) {
+          await tx
+            .update(product)
+            .set({ stock: sql`${product.stock} + ${it.qty}` })
+            .where(eq(product.id, it.productId));
+          await tx.insert(stockMovement).values({
+            productId: it.productId,
+            type: "ADJUST",
+            qty: it.qty,
+            ref: order.code,
+            note: "Void transaksi",
+          });
+        }
+      }
+    });
+  } catch (err) {
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : "Gagal membatalkan.",
+    };
+  }
+  await logAudit("void", "pos_order", id);
+  revalidatePath("/admin/pos/riwayat");
+  revalidatePath("/admin/pos");
+  return { ok: true };
 }
 
 // --- Produk CRUD ---

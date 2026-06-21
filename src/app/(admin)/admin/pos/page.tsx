@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { and, asc, eq, inArray } from "drizzle-orm";
-import { Package } from "lucide-react";
+import { Package, History } from "lucide-react";
 import { db } from "@/db";
 import { courtBooking, court } from "@/db/schema";
 import { AdminPageHeader } from "@/components/admin/page-header";
@@ -52,13 +52,22 @@ export default async function PosPage() {
         accent="Kasir"
         sub="Jual produk F&B, pro-shop, atau sewa alat. Pilih item, atur jumlah, lalu bayar."
         action={
-          <Link
-            href="/admin/pos/produk"
-            className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium hover:bg-cream/40"
-          >
-            <Package className="size-4" strokeWidth={2} />
-            Kelola Produk
-          </Link>
+          <div className="flex gap-2">
+            <Link
+              href="/admin/pos/riwayat"
+              className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium hover:bg-cream/40"
+            >
+              <History className="size-4" strokeWidth={2} />
+              Riwayat
+            </Link>
+            <Link
+              href="/admin/pos/produk"
+              className="inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium hover:bg-cream/40"
+            >
+              <Package className="size-4" strokeWidth={2} />
+              Kelola Produk
+            </Link>
+          </div>
         }
       />
 

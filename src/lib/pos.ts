@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, desc, eq, gte, inArray, sql } from "drizzle-orm";
+import { and, asc, between, desc, eq, gte, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import {
   product,
@@ -212,6 +212,23 @@ export async function posTotalsByBooking(
     if (r.bookingId) map.set(r.bookingId, Number(r.sum));
   }
   return map;
+}
+
+// Batas hari WIB (UTC+7) untuk kolom timestamp.
+function wibStart(ymd: string): Date {
+  return new Date(`${ymd}T00:00:00+07:00`);
+}
+function wibEnd(ymd: string): Date {
+  return new Date(`${ymd}T23:59:59.999+07:00`);
+}
+
+// Daftar transaksi POS dalam rentang tanggal (untuk Riwayat). Terbaru dulu.
+export async function getPosOrders(from: string, to: string) {
+  return db
+    .select()
+    .from(posOrder)
+    .where(between(posOrder.createdAt, wibStart(from), wibEnd(to)))
+    .orderBy(desc(posOrder.createdAt));
 }
 
 // --- Shift kasir ---
