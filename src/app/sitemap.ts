@@ -1,6 +1,10 @@
 import type { MetadataRoute } from "next";
 import { getSettings } from "@/lib/settings";
 
+// Baca settings (ligaEnabled) saat request, BUKAN di-prerender saat build
+// (DB tak ada saat build -> harus dynamic).
+export const dynamic = "force-dynamic";
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://padel.motekreatif.com";
 
 type Route = {

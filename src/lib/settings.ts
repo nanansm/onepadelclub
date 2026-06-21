@@ -281,9 +281,18 @@ export function mergeSettings(v: Venue | null): Settings {
 }
 
 // Ambil settings (per-request cache). Selalu return objek lengkap (pakai default).
+// DB unreachable (mis. saat `next build` prerender, atau DB blip di runtime) ->
+// fallback DEFAULTS, bukan throw. Ini bikin build tak crash & 1 DB down tak
+// bikin layar putih (sejalan filosofi anti-stuck). Route yang butuh data DB
+// nyata harus tetap `export const dynamic = "force-dynamic"`.
 export const getSettings = cache(async (): Promise<Settings> => {
-  const rows = await db.select().from(venue).limit(1);
-  return mergeSettings(rows[0] ?? null);
+  try {
+    const rows = await db.select().from(venue).limit(1);
+    return mergeSettings(rows[0] ?? null);
+  } catch (err) {
+    console.warn("[settings] getSettings gagal, pakai DEFAULTS:", err);
+    return DEFAULTS;
+  }
 });
 
 // --- Helper presentasi ---
