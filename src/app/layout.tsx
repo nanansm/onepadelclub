@@ -19,7 +19,7 @@ const instrumentSerif = Instrument_Serif({
   display: "swap",
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://onepadelclub.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://padel.motekreatif.com";
 
 // Metadata white-label: title/deskripsi/OG ikut Settings venue.
 export async function generateMetadata(): Promise<Metadata> {

@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getSettings } from "@/lib/settings";
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://onepadelclub.com";
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://padel.motekreatif.com";
 
 type Route = {
   path: string;

@@ -1,6 +1,6 @@
 # Deploy Padel Club ke Easypanel
 
-Panduan deploy `onepadel.motekreatif.com`. Tujuan: jalan stabil, tidak nyangkut,
+Panduan deploy `padel.motekreatif.com`. Tujuan: jalan stabil, tidak nyangkut,
 dan setelah live **semua konten bisa diatur operator non-teknis dari `/admin`**
 tanpa sentuh kode.
 
@@ -44,8 +44,8 @@ Easypanel → **+ Service → App**.
 ```
 DATABASE_URL=postgresql://<user>:<pass>@onepadel-db:5432/<db>
 BETTER_AUTH_SECRET=<random 32+ char>          # generate: openssl rand -base64 32
-BETTER_AUTH_URL=https://onepadel.motekreatif.com
-NEXT_PUBLIC_SITE_URL=https://onepadel.motekreatif.com
+BETTER_AUTH_URL=https://padel.motekreatif.com
+NEXT_PUBLIC_SITE_URL=https://padel.motekreatif.com
 ADMIN_EMAILS=motekreatif@gmail.com
 ```
 
@@ -82,8 +82,8 @@ SMTP_HOST= SMTP_PORT= SMTP_USER= SMTP_PASSWORD= SMTP_SECURE= SMTP_FROM_EMAIL= SM
 
 ## 4. Domain + HTTPS
 
-Easypanel → app → **Domains** → tambah `onepadel.motekreatif.com` → target port **3007** → aktifkan HTTPS (Let's Encrypt).
-Di DNS `motekreatif.com`: tambah record **A/CNAME** `onepadel` → IP/host server Easypanel.
+Easypanel → app → **Domains** → tambah `padel.motekreatif.com` → target port **3007** → aktifkan HTTPS (Let's Encrypt).
+Di DNS `motekreatif.com`: tambah record **A/CNAME** `padel` → IP/host server Easypanel.
 
 ## 5. Deploy
 
@@ -102,7 +102,7 @@ tapi tidak wajib untuk slot bebas kembali.
 
 ## 7. Verifikasi pasca-deploy
 
-- [ ] `https://onepadel.motekreatif.com/api/health` → `{"ok":true,"db":"up"}`
+- [ ] `https://padel.motekreatif.com/api/health` → `{"ok":true,"db":"up"}`
 - [ ] Landing tampil (court, fasilitas, galeri)
 - [ ] Login `/login` pakai SEED_ADMIN_EMAIL/PASSWORD → masuk `/admin`
 - [ ] `/admin/courts` bisa tambah lapangan (venue row sudah ada via bootstrap)
