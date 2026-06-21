@@ -122,17 +122,17 @@ export const DEFAULT_FACILITIES: FacilityItem[] = [
 // Galeri default = foto bawaan di /public. Owner ganti via /admin/settings.
 export const DEFAULT_GALLERY: GalleryItem[] = [
   {
-    src: "/img3.jpg",
+    src: "/newimg4.webp",
     tag: "Venue",
     caption: "Lapangan indoor yang nyaman buat main maupun nongkrong.",
   },
   {
-    src: "/img2.jpg",
+    src: "/newimg2.webp",
     tag: "Turnamen",
     caption: "Event & turnamen rutin — dari mabar santai sampai liga resmi.",
   },
   {
-    src: "/img4.jpg",
+    src: "/newimg3.webp",
     tag: "Komunitas",
     caption: "Pemain dari berbagai level main bareng tiap minggu.",
   },

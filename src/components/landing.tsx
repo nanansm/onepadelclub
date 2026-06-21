@@ -110,8 +110,8 @@ export function Hero({
 
         <div className="opc-poster">
           <Image
-            src={settings.heroImageUrl || "/img1.jpg"}
-            alt="Main padel di One Padel Club Garut"
+            src={settings.heroImageUrl || "/newimg1.webp"}
+            alt={`Main padel di ${settings.name}`}
             fill
             priority
             sizes="(max-width: 880px) 90vw, 460px"
@@ -234,7 +234,7 @@ export function CommunitySection({ settings }: { settings: Settings }) {
             <figure className="opc-gallery-item" key={`${g.src}-${i}`}>
               <Image
                 src={g.src}
-                alt={g.caption || g.tag || "One Padel Club"}
+                alt={g.caption || g.tag || settings.name}
                 fill
                 sizes="(max-width: 880px) 90vw, 360px"
                 className="opc-gallery-img"
