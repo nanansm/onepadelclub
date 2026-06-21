@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "next dev -p 3007",
     "build": "next build",
-    "start": "node scripts/migrate-prod.mjs && next start -p 3007",
+    "start": "node scripts/migrate-prod.mjs && node scripts/demo-seed.mjs && next start -p 3007",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
