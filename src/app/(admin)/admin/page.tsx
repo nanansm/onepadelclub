@@ -11,6 +11,7 @@ import {
   BadgeCheck,
   Trophy,
   ShoppingCart,
+  BarChart3,
   Settings,
   AlertTriangle,
   type LucideIcon,
@@ -76,6 +77,12 @@ const manageTiles: {
     desc: "Skor, tim, jadwal, season",
     icon: Trophy,
     module: "liga",
+  },
+  {
+    label: "Laporan Keuangan",
+    href: "/admin/laporan",
+    desc: "Pemasukan booking + POS, export",
+    icon: BarChart3,
   },
   {
     label: "Pengaturan",

@@ -13,6 +13,19 @@ import { genCode, isUniqueViolation } from "@/lib/code";
 
 export type { Product };
 
+// Ambil 1 order + itemnya untuk struk. null kalau tak ada.
+export async function getOrderWithItems(code: string) {
+  const order = (
+    await db.select().from(posOrder).where(eq(posOrder.code, code)).limit(1)
+  )[0];
+  if (!order) return null;
+  const items = await db
+    .select()
+    .from(posOrderItem)
+    .where(eq(posOrderItem.orderId, order.id));
+  return { order, items };
+}
+
 export type CartLine = { productId: string; qty: number };
 
 export type SaleInput = {
@@ -171,6 +184,28 @@ export async function createSale(input: SaleInput): Promise<SaleResult> {
     console.error("[createSale]", err);
     return { ok: false, error: "Gagal memproses penjualan, coba lagi." };
   }
+}
+
+// Total penjualan POS (status PAID) per bookingId. Untuk "tab" lapangan.
+export async function posTotalsByBooking(
+  bookingIds: string[],
+): Promise<Map<string, number>> {
+  const map = new Map<string, number>();
+  if (bookingIds.length === 0) return map;
+  const rows = await db
+    .select({
+      bookingId: posOrder.bookingId,
+      sum: sql<number>`coalesce(sum(${posOrder.total}), 0)`,
+    })
+    .from(posOrder)
+    .where(
+      and(eq(posOrder.status, "PAID"), inArray(posOrder.bookingId, bookingIds)),
+    )
+    .groupBy(posOrder.bookingId);
+  for (const r of rows) {
+    if (r.bookingId) map.set(r.bookingId, Number(r.sum));
+  }
+  return map;
 }
 
 // --- Shift kasir ---

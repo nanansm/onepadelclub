@@ -3,6 +3,8 @@ import { AdminPageHeader } from "@/components/admin/page-header";
 import { getUpcomingBookings } from "@/lib/booking";
 import { expireStaleBookings } from "@/lib/expire";
 import { getCourts } from "@/lib/venue";
+import { getSettings } from "@/lib/settings";
+import { posTotalsByBooking } from "@/lib/pos";
 import { dateLabelId, rangeLabel } from "@/lib/format";
 import { rupiah } from "@/lib/utils";
 import { todayJakarta } from "@/lib/tz";
@@ -15,10 +17,16 @@ export default async function AdminBookingsPage() {
   // Rapikan PENDING basi -> CANCELLED dulu supaya daftar di bawah jujur
   // (PENDING = beneran nunggu bayar). Tanpa cron.
   await expireStaleBookings();
-  const [rows, courts] = await Promise.all([
+  const [rows, courts, settings] = await Promise.all([
     getUpcomingBookings(),
     getCourts(),
+    getSettings(),
   ]);
+
+  // Total tab F&B (POS) per booking — cuma kalau modul POS aktif.
+  const posTab = settings.posEnabled
+    ? await posTotalsByBooking(rows.map((r) => r.booking.id))
+    : new Map<string, number>();
 
   return (
     <div>
@@ -80,6 +88,11 @@ export default async function AdminBookingsPage() {
                   </span>{" "}
                   · <span className="text-muted">{booking.code}</span>
                 </p>
+                {posTab.get(booking.id) ? (
+                  <p className="mt-1 inline-flex items-center rounded-full bg-cream/60 px-2 py-0.5 text-xs font-medium text-brand">
+                    🛒 Tab F&B: {rupiah(posTab.get(booking.id)!)}
+                  </p>
+                ) : null}
               </div>
               <div className="mt-3 sm:mt-0">
                 <BookingActions id={booking.id} status={booking.status} />

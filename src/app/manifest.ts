@@ -1,15 +1,17 @@
 import type { MetadataRoute } from "next";
+import { getSettings } from "@/lib/settings";
 
-export default function manifest(): MetadataRoute.Manifest {
+// White-label: nama/warna/deskripsi ikut Settings venue (bukan hardcode).
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const s = await getSettings();
   return {
-    name: "One Padel Club",
-    short_name: "One Padel",
-    description:
-      "Booking lapangan padel, open play, coaching, dan membership di Garut.",
+    name: s.name,
+    short_name: s.name.split(" ").slice(0, 2).join(" "),
+    description: s.metaDescription,
     start_url: "/",
     display: "standalone",
     background_color: "#ffffff",
-    theme_color: "#1a4d33",
+    theme_color: s.brandPrimary,
     icons: [
       { src: "/icon.png", sizes: "512x512", type: "image/png" },
       { src: "/apple-icon.png", sizes: "180x180", type: "image/png" },

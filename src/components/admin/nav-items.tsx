@@ -7,6 +7,7 @@ import {
   BadgeCheck,
   Trophy,
   ShoppingCart,
+  BarChart3,
   Settings,
   type LucideIcon,
 } from "lucide-react";
@@ -29,6 +30,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { label: "Membership", href: "/admin/membership", icon: BadgeCheck },
   { label: "POS Kasir", href: "/admin/pos", icon: ShoppingCart, module: "pos" },
   { label: "Liga", href: "/admin/liga", icon: Trophy, module: "liga" },
+  { label: "Laporan", href: "/admin/laporan", icon: BarChart3 },
   { label: "Pengaturan", href: "/admin/settings", icon: Settings },
 ];
 

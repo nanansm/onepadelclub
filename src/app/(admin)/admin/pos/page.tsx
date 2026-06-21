@@ -1,9 +1,15 @@
 import Link from "next/link";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { Package } from "lucide-react";
+import { db } from "@/db";
+import { courtBooking, court } from "@/db/schema";
 import { AdminPageHeader } from "@/components/admin/page-header";
-import { getProducts } from "@/lib/pos";
+import { getProducts, getOpenShift, cashSalesSince } from "@/lib/pos";
 import { getVenue } from "@/lib/venue";
+import { todayJakarta } from "@/lib/tz";
+import { rangeLabel } from "@/lib/format";
 import { Cashier } from "./cashier";
+import { ShiftPanel } from "./shift-panel";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +19,31 @@ export default async function PosPage() {
     getVenue(),
   ]);
   const taxPercent = venue?.taxPercent ?? 0;
+
+  const shift = venue ? await getOpenShift(venue.id) : null;
+  const shiftCashSales =
+    venue && shift ? await cashSalesSince(venue.id, shift.openedAt) : 0;
+
+  // Booking lapangan aktif hari ini → bisa ditempeli penjualan (tab).
+  const today = todayJakarta();
+  const todayBookings = await db
+    .select({
+      id: courtBooking.id,
+      code: courtBooking.code,
+      customerName: courtBooking.customerName,
+      startHour: courtBooking.startHour,
+      duration: courtBooking.duration,
+      courtName: court.name,
+    })
+    .from(courtBooking)
+    .innerJoin(court, eq(court.id, courtBooking.courtId))
+    .where(
+      and(
+        eq(courtBooking.date, today),
+        inArray(courtBooking.status, ["PENDING", "PAID"]),
+      ),
+    )
+    .orderBy(asc(courtBooking.startHour));
 
   return (
     <div>
@@ -30,6 +61,20 @@ export default async function PosPage() {
           </Link>
         }
       />
+
+      <div className="mt-6">
+        <ShiftPanel
+          shift={
+            shift
+              ? {
+                  openedAt: shift.openedAt.toISOString(),
+                  openingCash: shift.openingCash,
+                  cashSales: shiftCashSales,
+                }
+              : null
+          }
+        />
+      </div>
 
       <div className="mt-6">
         {products.length === 0 ? (
@@ -57,6 +102,12 @@ export default async function PosPage() {
               stock: p.stock,
             }))}
             taxPercent={taxPercent}
+            bookings={todayBookings.map((b) => ({
+              id: b.id,
+              label: `${b.code} · ${b.courtName} · ${rangeLabel(b.startHour, b.duration)}${
+                b.customerName ? ` · ${b.customerName}` : ""
+              }`,
+            }))}
           />
         )}
       </div>

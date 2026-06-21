@@ -1,9 +1,10 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Plus, Minus, Trash2, ScanLine, X } from "lucide-react";
+import { Plus, Minus, Trash2, ScanLine, X, Printer, CheckCircle2 } from "lucide-react";
 import { rupiah } from "@/lib/utils";
 import { createSaleAction } from "./actions";
 
@@ -37,12 +38,16 @@ const PAY_LABEL: Record<Pay, string> = {
 const inputClass =
   "w-full rounded-lg border bg-white px-3 py-2 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20";
 
+type BookingOption = { id: string; label: string };
+
 export function Cashier({
   products,
   taxPercent,
+  bookings,
 }: {
   products: ProductLite[];
   taxPercent: number;
+  bookings: BookingOption[];
 }) {
   const router = useRouter();
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -51,7 +56,11 @@ export function Cashier({
   const [discount, setDiscount] = useState("");
   const [pay, setPay] = useState<Pay>("CASH");
   const [customerName, setCustomerName] = useState("");
+  const [bookingId, setBookingId] = useState("");
   const [busy, setBusy] = useState(false);
+  const [lastSale, setLastSale] = useState<{ code: string; total: number } | null>(
+    null,
+  );
   const scanRef = useRef<HTMLInputElement>(null);
 
   // Kategori yang benar-benar ada produknya.
@@ -129,24 +138,57 @@ export function Cashier({
       discount: disc,
       paymentMethod: pay,
       customerName,
+      ...(bookingId ? { bookingId, bookingType: "court" } : {}),
     });
     setBusy(false);
     if (!res.ok) {
       toast.error(res.error ?? "Gagal");
       return;
     }
-    toast.success(`Transaksi ${res.code} berhasil · ${rupiah(res.total ?? total)}`);
+    toast.success(`Transaksi ${res.code} berhasil`);
+    setLastSale({ code: res.code!, total: res.total ?? total });
     setCart([]);
     setDiscount("");
     setCustomerName("");
     setPay("CASH");
+    setBookingId("");
     router.refresh();
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
-      {/* Katalog */}
-      <div className="space-y-3">
+    <div className="space-y-4">
+      {/* Banner sukses + cetak struk */}
+      {lastSale ? (
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-green-200 bg-green-50 p-4">
+          <div className="flex items-center gap-2 text-green-800">
+            <CheckCircle2 className="size-5 shrink-0" />
+            <span className="text-sm font-medium">
+              Transaksi <strong>{lastSale.code}</strong> berhasil ·{" "}
+              {rupiah(lastSale.total)}
+            </span>
+          </div>
+          <div className="flex gap-2">
+            <Link
+              href={`/admin/pos/struk/${lastSale.code}`}
+              target="_blank"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-brand px-3 py-2 text-sm font-medium text-brand-fg"
+            >
+              <Printer className="size-4" /> Cetak Struk
+            </Link>
+            <button
+              type="button"
+              onClick={() => setLastSale(null)}
+              className="rounded-lg border bg-white px-3 py-2 text-sm font-medium hover:bg-cream/40"
+            >
+              Transaksi Baru
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="grid gap-4 lg:grid-cols-[1fr_22rem]">
+        {/* Katalog */}
+        <div className="space-y-3">
         <form onSubmit={onScan} className="relative">
           <ScanLine className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted" />
           <input
@@ -289,6 +331,25 @@ export function Cashier({
                 className={inputClass}
               />
             </label>
+            {bookings.length > 0 ? (
+              <label className="block">
+                <span className="text-xs font-medium text-muted">
+                  Tempel ke booking lapangan (opsional)
+                </span>
+                <select
+                  value={bookingId}
+                  onChange={(e) => setBookingId(e.target.value)}
+                  className={inputClass}
+                >
+                  <option value="">— Walk-in (tanpa booking) —</option>
+                  {bookings.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
           </div>
 
           {/* Metode bayar */}
@@ -331,6 +392,7 @@ export function Cashier({
             {busy ? "Memproses…" : `Bayar ${rupiah(total)}`}
           </button>
         </div>
+      </div>
       </div>
     </div>
   );

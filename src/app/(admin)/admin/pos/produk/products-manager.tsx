@@ -39,6 +39,11 @@ const inputClass =
 const labelClass = "block space-y-1";
 const labelText = "text-xs font-medium text-muted";
 
+// Ambang stok menipis (produk dilacak & aktif).
+const LOW_STOCK = 5;
+const isLow = (p: ProductRow) =>
+  p.active && p.trackStock && p.stock <= LOW_STOCK;
+
 export function ProductsManager({ products }: { products: ProductRow[] }) {
   const router = useRouter();
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -65,8 +70,19 @@ export function ProductsManager({ products }: { products: ProductRow[] }) {
     return true;
   }
 
+  const lowStock = products.filter(isLow);
+
   return (
     <div className="space-y-6">
+      {/* Alert stok menipis */}
+      {lowStock.length > 0 ? (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+          <strong>Stok menipis ({lowStock.length}):</strong>{" "}
+          {lowStock.map((p) => `${p.name} (${p.stock})`).join(", ")}. Segera
+          restock biar tak kehabisan saat ramai.
+        </div>
+      ) : null}
+
       {/* Tambah produk */}
       <form
         action={async (fd) => {
@@ -223,7 +239,14 @@ export function ProductsManager({ products }: { products: ProductRow[] }) {
                     <p className="mt-0.5 text-sm text-muted">
                       {rupiah(p.price)}
                       {p.cost > 0 ? ` · modal ${rupiah(p.cost)}` : ""}
-                      {p.trackStock ? ` · stok ${p.stock}` : " · stok tak dilacak"}
+                      {p.trackStock ? (
+                        <span className={isLow(p) ? "font-semibold text-amber-700" : ""}>
+                          {" · "}stok {p.stock}
+                          {isLow(p) ? " ⚠️" : ""}
+                        </span>
+                      ) : (
+                        " · stok tak dilacak"
+                      )}
                       {p.barcode ? ` · ${p.barcode}` : ""}
                     </p>
                   </div>
