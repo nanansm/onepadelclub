@@ -23,12 +23,12 @@ export type AdminNavItem = {
 // Top-level admin nav. Liga sub-menu (skor/tim/jadwal/season) hidup di hub /admin/liga.
 export const ADMIN_NAV: AdminNavItem[] = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  { label: "POS Kasir", href: "/admin/pos", icon: ShoppingCart, module: "pos" },
   { label: "Booking", href: "/admin/bookings", icon: CalendarCheck },
   { label: "Lapangan", href: "/admin/courts", icon: LayoutGrid },
   { label: "Open Play", href: "/admin/open-play", icon: Users },
   { label: "Coaching", href: "/admin/coaching", icon: GraduationCap },
   { label: "Membership", href: "/admin/membership", icon: BadgeCheck },
-  { label: "POS Kasir", href: "/admin/pos", icon: ShoppingCart, module: "pos" },
   { label: "Liga", href: "/admin/liga", icon: Trophy, module: "liga" },
   { label: "Laporan", href: "/admin/laporan", icon: BarChart3 },
   { label: "Pengaturan", href: "/admin/settings", icon: Settings },

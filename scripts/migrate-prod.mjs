@@ -12,11 +12,18 @@ import postgres from "postgres";
 async function seedBaseData(sql) {
   let venue = (await sql`SELECT id FROM onepadel.venue LIMIT 1`)[0];
   if (!venue) {
+    // White-label: nama/slug klien dari env (Easypanel). Default netral.
+    const name = (process.env.VENUE_NAME || "Padel Club").trim();
+    const slug = (
+      process.env.VENUE_SLUG ||
+      name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") ||
+      "padel-club"
+    ).trim();
     venue = (
       await sql`INSERT INTO onepadel.venue (id, name, slug)
-        VALUES (${randomUUID()}, 'One Padel Club', 'one-padel-club') RETURNING id`
+        VALUES (${randomUUID()}, ${name}, ${slug}) RETURNING id`
     )[0];
-    console.log("[migrate] venue dibuat.");
+    console.log(`[migrate] venue dibuat: ${name} (${slug}).`);
   }
   const courts = await sql`SELECT id FROM onepadel.court LIMIT 1`;
   if (courts.length === 0) {

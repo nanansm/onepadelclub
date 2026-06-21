@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Backup Postgres One Padel Club -> file gzip. Jalankan via cron / Easypanel
+# Backup Postgres Padel Club -> file gzip. Jalankan via cron / Easypanel
 # Scheduled Task harian. Upload hasilnya ke R2/offsite (lihat catatan bawah).
 #
 #   DATABASE_URL=postgresql://... ./scripts/backup.sh /path/to/backups

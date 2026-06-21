@@ -139,6 +139,52 @@ export function ReceiptView({ venue, order, items }: Props) {
           Sampai ketemu lagi!
         </p>
       </div>
+
+      {/* Panduan printer (tak ikut tercetak) */}
+      <details className="no-print mt-4 rounded-xl border bg-card p-4 text-sm">
+        <summary className="cursor-pointer font-medium">
+          Cara setel printer struk (thermal 58/80mm)
+        </summary>
+        <div className="mt-3 space-y-3 text-muted">
+          <div>
+            <p className="font-medium text-foreground">Printer USB (PC/laptop)</p>
+            <ol className="ml-4 list-decimal space-y-1">
+              <li>Colok printer ke USB, nyalakan.</li>
+              <li>
+                Install driver printer (dari CD/website merek, atau pilih driver
+                generik <em>&quot;Generic / Text Only&quot;</em> di Windows).
+              </li>
+              <li>
+                Buka <b>Devices &amp; Printers</b> → klik kanan printer →{" "}
+                <b>Set as default</b>. Atur ukuran kertas 80mm (atau 58mm).
+              </li>
+              <li>
+                Klik <b>Cetak Struk</b> → di dialog cetak pilih printer thermal →
+                Print.
+              </li>
+            </ol>
+          </div>
+          <div>
+            <p className="font-medium text-foreground">Printer Bluetooth</p>
+            <ol className="ml-4 list-decimal space-y-1">
+              <li>
+                Nyalakan printer → buka <b>Bluetooth</b> PC → <b>Pair</b> printer.
+              </li>
+              <li>Install driver (sama seperti USB) supaya muncul jadi printer.</li>
+              <li>Set as default → Cetak Struk → pilih printer → Print.</li>
+            </ol>
+            <p className="mt-1 text-xs">
+              Tablet/HP Android: pakai aplikasi <b>RawBT</b> (Play Store) sebagai
+              printer Bluetooth, lalu Cetak Struk → pilih RawBT.
+            </p>
+          </div>
+          <p className="text-xs">
+            Tip: jadikan printer thermal sebagai <b>default</b> + centang
+            &quot;jangan tampilkan dialog&quot; (kalau ada) supaya sekali klik
+            langsung keluar struk.
+          </p>
+        </div>
+      </details>
     </div>
   );
 }

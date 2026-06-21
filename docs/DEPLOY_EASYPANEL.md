@@ -1,4 +1,4 @@
-# Deploy One Padel Club ke Easypanel
+# Deploy Padel Club ke Easypanel
 
 Panduan deploy `onepadel.motekreatif.com`. Tujuan: jalan stabil, tidak nyangkut,
 dan setelah live **semua konten bisa diatur operator non-teknis dari `/admin`**
