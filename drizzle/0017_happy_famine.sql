@@ -1,0 +1,1 @@
+ALTER TABLE "onepadel"."pos_order" ADD COLUMN "cash_received" integer;

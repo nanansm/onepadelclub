@@ -38,6 +38,7 @@ export type SaleInput = {
   note?: string;
   bookingId?: string;
   bookingType?: string;
+  cashReceived?: number;
   taxPercent: number;
 };
 
@@ -142,6 +143,10 @@ export async function createSale(input: SaleInput): Promise<SaleResult> {
               total: totals.total,
               paymentMethod: input.paymentMethod,
               status: "PAID",
+              cashReceived:
+                input.paymentMethod === "CASH" && input.cashReceived != null
+                  ? input.cashReceived
+                  : null,
               note: input.note ?? null,
               paidAt: new Date(),
             })

@@ -34,6 +34,7 @@ export default async function ReceiptPage({
         tax: order.tax,
         total: order.total,
         paymentMethod: order.paymentMethod,
+        cashReceived: order.cashReceived,
       }}
       items={items.map((i) => ({
         name: i.nameSnapshot,

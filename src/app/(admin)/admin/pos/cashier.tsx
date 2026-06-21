@@ -157,6 +157,7 @@ export function Cashier({
       paymentMethod: pay,
       customerName,
       ...(bookingId ? { bookingId, bookingType: "court" } : {}),
+      ...(pay === "CASH" && tenderedNum > 0 ? { cashReceived: tenderedNum } : {}),
     });
     setBusy(false);
     if (!res.ok) {

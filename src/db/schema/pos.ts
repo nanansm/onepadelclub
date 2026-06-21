@@ -94,6 +94,8 @@ export const posOrder = onepadel.table(
     total: integer("total").notNull().default(0),
     paymentMethod: posPaymentMethod("payment_method").notNull().default("CASH"),
     status: posOrderStatus("status").notNull().default("OPEN"),
+    // Uang tunai diterima (untuk hitung kembalian di struk). null = non-tunai.
+    cashReceived: integer("cash_received"),
     note: text("note"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     paidAt: timestamp("paid_at"),

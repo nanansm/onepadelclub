@@ -31,6 +31,7 @@ const saleSchema = z.object({
   note: z.string().trim().optional().default(""),
   bookingId: z.string().trim().optional(),
   bookingType: z.string().trim().optional(),
+  cashReceived: z.coerce.number().int().min(0).optional(),
 });
 
 export async function createSaleAction(
@@ -54,6 +55,7 @@ export async function createSaleAction(
     note: parsed.data.note || undefined,
     bookingId: parsed.data.bookingId || undefined,
     bookingType: parsed.data.bookingType || undefined,
+    cashReceived: parsed.data.cashReceived,
     taxPercent: venue.taxPercent ?? 0,
   });
   if (res.ok) {

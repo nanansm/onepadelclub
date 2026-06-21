@@ -15,6 +15,7 @@ type Props = {
     tax: number;
     total: number;
     paymentMethod: string;
+    cashReceived: number | null;
   };
   items: { name: string; price: number; qty: number; lineTotal: number }[];
 };
@@ -122,6 +123,15 @@ export function ReceiptView({ venue, order, items }: Props) {
           label="Bayar"
           value={PAY_LABEL[order.paymentMethod] ?? order.paymentMethod}
         />
+        {order.paymentMethod === "CASH" && order.cashReceived != null ? (
+          <>
+            <Line label="Tunai" value={rupiah(order.cashReceived)} />
+            <Line
+              label="Kembalian"
+              value={rupiah(Math.max(0, order.cashReceived - order.total))}
+            />
+          </>
+        ) : null}
 
         <Sep />
         <p className="text-center text-[11px]">
